@@ -1,0 +1,135 @@
+{
+  "version": "public-10-v1",
+  "description": "Deep-research benchmark — 10 cases across 8 categories. Designed to test where agentic / retrieval-augmented systems should genuinely outperform single-shot LLMs. Each case has cheap regex contracts + structural minimums + an LLM-as-judge rubric. Cases are intentionally about post-2024 topics, niche technical areas, or questions that reward synthesis across sources.",
+  "cases": [
+    {
+      "id": "recency-python-3-13-features",
+      "category": "recency",
+      "severity": "P1",
+      "query": "What are the major new features in Python 3.13? List at least 3 with brief explanations.",
+      "must_contain_regex": [
+        "3\\.13",
+        "(jit|free.?threaded|gil|repl|warning)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 80,
+      "judge_criteria": "Does the answer mention 3+ real 3.13 features (experimental JIT, free-threaded build / PEP 703, improved REPL, deprecation warnings, etc.)? Score 1-5 for accuracy and specificity."
+    },
+    {
+      "id": "recency-open-weight-llms-2025",
+      "category": "recency",
+      "severity": "P1",
+      "query": "Name three notable open-weight large language model releases from 2025. For each, give the model name, the organization, and roughly what made it noteworthy.",
+      "must_contain_regex": [
+        "2025"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 100,
+      "judge_criteria": "Does the answer name 3 distinct 2025 open-weight releases (NOT proprietary-only)? For each, name + org + a real reason for notability? Score 1-5; 5 = all three correct and distinct."
+    },
+    {
+      "id": "synthesis-orm-comparison",
+      "category": "synthesis",
+      "severity": "P1",
+      "query": "Compare these five ORMs: SQLAlchemy, Django ORM, Prisma, Sequelize, ActiveRecord. For each, give: primary language, async support (yes/no/partial), license.",
+      "must_contain_regex": [
+        "sqlalchemy",
+        "(django|prisma)",
+        "(sequelize|activerecord)"
+      ],
+      "min_citation_count": 0,
+      "min_word_count": 120,
+      "judge_criteria": "Does the answer cover ALL five ORMs with three required attributes each? Penalize hallucinated facts (e.g. wrong language for Prisma)."
+    },
+    {
+      "id": "citation-density-http3-priority",
+      "category": "citation-density",
+      "severity": "P2",
+      "query": "How does HTTP/3 handle stream prioritization? Reference the relevant RFC sections.",
+      "must_contain_regex": [
+        "(http.?3|http/3)",
+        "(rfc|priority)"
+      ],
+      "min_citation_count": 2,
+      "min_word_count": 100,
+      "judge_criteria": "Does the answer cite specific RFCs (e.g. RFC 9114, RFC 9218) and describe the actual mechanism (extensible priorities, urgency + incremental)? Score 1-5 for correctness."
+    },
+    {
+      "id": "niche-attention-free-lms",
+      "category": "niche-post-cutoff",
+      "severity": "P2",
+      "query": "What is the current state of attention-free language model architectures (RWKV, Mamba, RetNet)? What are their claimed advantages and where have they actually shown competitive results?",
+      "must_contain_regex": [
+        "(rwkv|mamba|retnet)",
+        "(state.?space|recurrent|linear|attention)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 150,
+      "judge_criteria": "Does the answer cover the three named architectures, explain the state-space / linear-attention thesis, AND give an honest read of where they've matched transformer baselines (versus only marketing claims)? Score 1-5; deduct for uncritical hype."
+    },
+    {
+      "id": "long-form-crdt-implementation",
+      "category": "long-form-analysis",
+      "severity": "P1",
+      "query": "Why are CRDTs (conflict-free replicated data types) difficult to implement correctly in production? Give specific bug categories developers have hit, not generic hand-waving.",
+      "must_contain_regex": [
+        "(crdt|conflict.?free)",
+        "(causal|tombstone|garbage|merge)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 200,
+      "judge_criteria": "Does the answer cite at least 3 SPECIFIC bug categories (e.g. tombstone garbage growth, causal-order violations on lossy networks, interleaving anomalies in sequence CRDTs, off-by-one in vector clocks)? Penalize generic 'distributed systems are hard' answers."
+    },
+    {
+      "id": "adversarial-self-evolving-agents",
+      "category": "adversarial-honest-deficit",
+      "severity": "P1",
+      "query": "What is the proven (peer-reviewed or independently-reproduced) performance of 'self-evolving' AI agents on long-horizon real-world tasks? Distinguish demo claims from reproduced benchmarks.",
+      "must_contain_regex": [
+        "(self.?evolv|self.?improv|long.?horizon)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 150,
+      "judge_criteria": "Does the answer ACKNOWLEDGE that as of the most recent benchmarks, claimed self-evolving agents have NOT shown reproduced long-horizon gains beyond ablation studies? Penalize uncritical repetition of vendor marketing. Score 1-5; 5 = the answer is willing to say 'no robust evidence yet'."
+    },
+    {
+      "id": "conflict-agi-embodiment",
+      "category": "cross-source-conflict",
+      "severity": "P2",
+      "query": "Does general intelligence require embodiment (physical sensorimotor experience)? Summarize the major schools of thought and the evidence each cites.",
+      "must_contain_regex": [
+        "(embodi|sensorimotor|grounding)",
+        "(symbol|connectionist|enacti|cognitive)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 180,
+      "judge_criteria": "Does the answer present at least 2 distinct positions (embodiment-required vs not-required vs middle-ground) with named proponents or schools (e.g. Brooks, Harnad, Chalmers, Lakoff) and the evidence each cites? Score 1-5; deduct for one-sided answers."
+    },
+    {
+      "id": "code-context-distributed-lock",
+      "category": "code-context-multi-step",
+      "severity": "P1",
+      "query": "How do you safely implement a distributed lock with TTL renewal? Address: (1) clock skew between nodes, (2) what happens if a network partition isolates the lock-holder mid-renewal, (3) why fencing tokens are needed even with TTL.",
+      "must_contain_regex": [
+        "(ttl|fencing|lease)",
+        "(skew|partition|clock|drift)"
+      ],
+      "min_citation_count": 1,
+      "min_word_count": 200,
+      "judge_criteria": "Does the answer correctly explain: TTL renewal logic, the Kleppmann critique of Redlock (clock-skew + GC pauses), fencing tokens as the additional invariant? Reference Kleppmann or Hykes-style analysis? Score 1-5; deduct for missing fencing or for repeating Redlock without caveats."
+    },
+    {
+      "id": "factual-tree-balancing",
+      "category": "factual-lookup",
+      "severity": "P2",
+      "query": "Compare AVL trees and Red-Black trees in terms of rebalancing operations. Specifically: how many rotations per insert/delete (worst case), and why one is preferred in real-world libraries.",
+      "must_contain_regex": [
+        "(avl|red.?black)",
+        "(rotation|balance|height)"
+      ],
+      "min_citation_count": 0,
+      "min_word_count": 120,
+      "judge_criteria": "Does the answer correctly state: AVL guarantees stricter balance (faster lookup, more rotations on mutation); Red-Black allows looser balance (fewer rotations on mutation, used by Linux kernel rbtree / std::map)? Score 1-5; deduct for swapped or hallucinated bounds."
+    }
+  ]
+}

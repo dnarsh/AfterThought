@@ -1,0 +1,127 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg
+*.egg-info/
+.eggs/
+.installed.cfg
+.python-version
+
+# ===== Caches =====
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.cache/
+
+# ===== Virtual envs =====
+.venv/
+.venv-*/
+venv/
+venv-*/
+env/
+ENV/
+
+# ===== Build artifacts =====
+dist/
+build/
+*.whl
+*.tar.gz
+
+# ===== Test / coverage =====
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# ===== Benchmark runtime artifacts =====
+# Reports / raw results land in results/ by default — NEVER commit
+# real engine outputs since they may include API responses with
+# embedded keys / quota info / user-specific data.
+results/
+reports/
+*.report.json
+*.report.md
+
+# ===== Editors / IDEs =====
+.idea/
+.vscode/
+.vscode-test/
+.history/
+*.swp
+*.swo
+*~
+
+# ===== Claude Code / AI assistant metadata =====
+.claude/
+.cursor/
+.aider*
+.continue/
+.codeium/
+
+# ===== OS =====
+.DS_Store
+.AppleDouble
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+
+# ===== Node (defensive) =====
+node_modules/
+
+# ===== SECRETS — never commit any of these =====
+.env
+.env.*
+*.env
+.envrc
+secrets/
+secret/
+credentials.json
+credentials.yaml
+credentials.yml
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+service-account*.json
+gcp-key*.json
+firebase-adminsdk*.json
+aws-credentials*
+.aws/
+.gcp/
+.azure/
+config.local.*
+*.local
+*-secret.*
+*-secrets.*
+*.private.*
+private/
+
+# ===== AI/ML provider tokens =====
+.anthropic
+.openai
+.huggingface/
+.cache/huggingface/
+.cohere
+.replicate
+.together
+
+# ===== Databases =====
+*.sqlite
+*.sqlite3
+*.db
+
+# ===== Allow template / sample files =====
+!.env.example
+!.env.sample
+!.env.template

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deep-research-bench"
+version = "0.1.0"
+description = "Evaluation framework for deep-research engines. Pluggable engine adapters, pluggable scorers (regex / citation count / word count / LLM-as-judge), markdown + JSON reports. Ships with 10 anonymized public benchmark cases."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "aiton08255", email = "ait.on.08255@gmail.com" }]
+keywords = ["benchmark", "eval", "evaluation", "llm", "deep-research", "rag", "agent-eval"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Testing",
+]
+# Zero required runtime deps. LLM judges are optional extras.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/aiton08255/deep-research-bench"
+Source = "https://github.com/aiton08255/deep-research-bench"
+Issues = "https://github.com/aiton08255/deep-research-bench/issues"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+anthropic = ["anthropic>=0.30"]
+openai = ["openai>=1.0"]
+
+[project.scripts]
+deep-research-bench = "deep_research_bench.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deep_research_bench"]
