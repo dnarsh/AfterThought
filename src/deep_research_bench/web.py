@@ -35,6 +35,8 @@ STATIC_TYPES = {
     ".js": "text/javascript; charset=utf-8",
     ".css": "text/css; charset=utf-8",
     ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".ico": "image/x-icon",
     ".ttf": "font/ttf",
     ".txt": "text/plain; charset=utf-8",
 }
@@ -135,6 +137,17 @@ class BenchHandler(BaseHTTPRequestHandler):
                 "cases": [asdict(case) for case in self.server.cases],
             })
             return
+        if path == "/api/connectome/brief":
+            try:
+                from deep_research_bench.connectome_brief import build_connectome_brief
+
+                self._json(200, build_connectome_brief())
+            except Exception:
+                self._json(502, {
+                    "error": "CONNECTOME_UNAVAILABLE",
+                    "message": "Could not prepare the source-derived evidence brief. Try again.",
+                })
+            return
         if path == "/api/connectome":
             try:
                 params = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
@@ -210,6 +223,33 @@ class BenchHandler(BaseHTTPRequestHandler):
             raise RequestError("Request body must be a JSON object.")
         return value
 
+    def _submitted_answer(self, answer: Any) -> EngineAnswer:
+        if not isinstance(answer, dict):
+            raise RequestError("Provide an answer for every selected case.")
+        text = answer.get("text")
+        citations = answer.get("citations", [])
+        if not isinstance(text, str) or len(text) > MAX_ANSWER_CHARS:
+            raise RequestError("Each answer must be text of at most 200,000 characters.")
+        if (
+            not isinstance(citations, list)
+            or len(citations) > 100
+            or any(not isinstance(value, str) or len(value) > 2048 for value in citations)
+        ):
+            raise RequestError("Citations must be at most 100 URL strings.")
+        for citation in citations:
+            try:
+                parsed = urlsplit(citation)
+                valid = parsed.scheme in ("https", "http") and bool(parsed.netloc)
+            except ValueError:
+                valid = False
+            if not valid:
+                raise RequestError("Citation URLs must use http or https.")
+        return EngineAnswer(
+            text=text,
+            citations=list(citations),
+            metadata={"source": "user-submitted", "generated_by_app": False},
+        )
+
     def _evaluate(self, payload: dict) -> dict:
         mode = payload.get("mode", "mock")
         if mode not in ("mock", "manual"):
@@ -233,32 +273,7 @@ class BenchHandler(BaseHTTPRequestHandler):
                 raise RequestError("Manual mode requires answers keyed by case ID.")
             answers = {}
             for case in cases:
-                answer = submitted.get(case.id)
-                if not isinstance(answer, dict):
-                    raise RequestError("Provide an answer for every selected case.")
-                text = answer.get("text")
-                citations = answer.get("citations", [])
-                if not isinstance(text, str) or len(text) > MAX_ANSWER_CHARS:
-                    raise RequestError("Each answer must be text of at most 200,000 characters.")
-                if (
-                    not isinstance(citations, list)
-                    or len(citations) > 100
-                    or any(not isinstance(value, str) or len(value) > 2048 for value in citations)
-                ):
-                    raise RequestError("Citations must be at most 100 URL strings.")
-                for citation in citations:
-                    try:
-                        parsed = urlsplit(citation)
-                        valid = parsed.scheme in ("https", "http") and bool(parsed.netloc)
-                    except ValueError:
-                        valid = False
-                    if not valid:
-                        raise RequestError("Citation URLs must use http or https.")
-                answers[case.query] = EngineAnswer(
-                    text=text,
-                    citations=list(citations),
-                    metadata={"source": "user-submitted", "generated_by_app": False},
-                )
+                answers[case.query] = self._submitted_answer(submitted.get(case.id))
             engine = ManualEngine(answers)
         run = run_benchmark(
             cases,
@@ -272,12 +287,27 @@ class BenchHandler(BaseHTTPRequestHandler):
         self.close_connection = True
         if not self._allowed_request():
             return
-        if urlsplit(self.path).path != "/api/run":
+        path = urlsplit(self.path).path
+        if path not in ("/api/run", "/api/connectome/evaluate"):
             self._json(404, {"error": "Endpoint not found."})
             return
         try:
             payload = self._read_payload()
             if payload is None:
+                return
+            if path == "/api/connectome/evaluate":
+                answer = self._submitted_answer(payload)
+                try:
+                    from deep_research_bench.connectome_brief import evaluate_connectome_answer
+
+                    result = evaluate_connectome_answer(answer)
+                except Exception:
+                    self._json(502, {
+                        "error": "CONNECTOME_UNAVAILABLE",
+                        "message": "Could not load the source facts for this evidence review. Try again.",
+                    })
+                    return
+                self._json(200, result)
                 return
             self._json(200, self._evaluate(payload))
         except RequestError as error:

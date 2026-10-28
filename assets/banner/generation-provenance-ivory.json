@@ -1,0 +1,52 @@
+{
+  "generatedUtc": "2026-10-28T05:33:22.850775+00:00",
+  "mode": "built-in image_gen: ivory-minimal edit, serene typography refinement, precise QR-only retry",
+  "preferredVisual": "assets/banner/afterthought-banner-ivory-qr.png",
+  "dimensions": [
+    1054,
+    1492
+  ],
+  "variants": [
+    {
+      "path": "assets/banner/afterthought-banner-ivory.png",
+      "sha256": "5b9c7798e6a3de3feacffd6c9127cc7e3c7cda80ff90fa5a5d0c3ec28a715f81",
+      "bytes": 2077161
+    },
+    {
+      "path": "assets/banner/afterthought-banner-ivory-qr.png",
+      "sha256": "953fc0b7fdf5f5f65fe5d33eece47f7b87c1e3731fc920b3d56f6e1740de5f9b",
+      "bytes": 1943497
+    }
+  ],
+  "promptFiles": [
+    {
+      "path": "assets/banner/ivory-prompt.txt",
+      "sha256": "19dfc5353b9a99dc8d7d580e9860c98ad8ed643619f3607848d91becc563bd09"
+    },
+    {
+      "path": "assets/banner/ivory-typography-prompt.txt",
+      "sha256": "59429bb0611a3bf3ff36967fc887989c2a7dd0b22839eaa84453ec1196bdca6e"
+    },
+    {
+      "path": "assets/banner/ivory-qr-prompt.txt",
+      "sha256": "1aecb46faa103421289f62798b68f950c94f83e23d9b1df44acb708ea40be078"
+    }
+  ],
+  "qrVerification": {
+    "decoder": "zxing-cpp 3.1.1",
+    "status": "FAILED_TO_DECODE",
+    "intendedUrl": "https://github.com/dnarsh/AfterThought",
+    "codesFound": 0,
+    "checks": [
+      "full image",
+      "QR crop",
+      "enlarged crop",
+      "grayscale crop",
+      "thresholded crop"
+    ],
+    "supportingVerifiedQr": "web/assets/brand/github-qr.png",
+    "supportingSha256": "312c823da49eb3cb689dc38090757f35a2f33832476f2857d5f9a59bb7c30e45"
+  },
+  "canonicalFinalReplaced": false,
+  "limits": "Main copy, member/register, college/header and department-head identities visually inspected; generated QR remains unqualified after exact-insert retry. Canonical final/provenance remain the prior independently decoded dark poster pending parent choice. No print-production qualification."
+}

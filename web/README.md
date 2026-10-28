@@ -1,84 +1,104 @@
-# AfterThought app
+# AfterThought app guide
 
-Run from a source checkout with Python 3.8 or newer:
+AfterThought is Arsh Talkhani’s local evidence workspace: a working browser UI over the existing Deep Research Bench Python runner, with an Einstein’s Jump research companion and a real published FlyWire metadata connection. The application uses an ivory, copper, and olive theme with locally bundled fonts.
+
+## Start the app
+
+Run from the repository checkout with Python 3.8 or newer:
 
 ```text
-python run_app.py
+python run_app.py --preload-connectome
 ```
 
-On Windows you can also double-click `start-app.cmd`. Open
-<http://127.0.0.1:8765> in your browser. For instant dataset demos use `python run_app.py --preload-connectome`. The Windows
-launcher enables this option. It warms the real metadata cache before serving;
-if loading fails the app still starts with a safe warning and an explicit Retry.
-The server binds only to the loopback
-interface. Stop it with Ctrl+C. The Introduction page explains the project and the in-app Live demo guide provides
-seven runnable presenter steps. No runtime dependencies, model accounts, or
-provider keys are needed. `python run_app.py --port 8766` chooses another port.
+Open <http://127.0.0.1:8765>. Windows users can double-click `start-app.cmd`. The launcher preloads the dataset before serving; without the preload flag, use **Load FlyWire snapshot** in the app. No runtime dependencies, provider accounts, API keys, or build step are required.
 
-## What works
+The server binds only to the loopback interface. Keep its terminal open; stop it with Ctrl+C. Choose another port with `python run_app.py --port 8766 --preload-connectome`, then use that port in the browser.
 
-- Browse and filter the repository's 10 real public cases, across 9 distinct
-  category labels. Inspect their regex contracts, citation minimums, word
-  minimums, and unexecuted judge rubrics.
-- Select cases and run the existing deterministic `MockEngine`. This engine is
-  deliberately poor; its failures are expected and always labeled as mock data.
-- Paste an answer and citation URLs to run the actual `RegexScorer`,
-  `CitationCountScorer`, and `WordCountScorer`. Inspect each result and its detail.
-- Keep up to 30 reports in browser memory for the current page session. Export
-  the actual JSON or Markdown report. Reloading clears browser history and
-  answer drafts; the server does not store submitted answers.
-- Browse a seven-phase companion to
-  [Einstein's Jump](https://github.com/dnarsh/einsteins-jump), with links to the
-  original research. Its historical results are attributed, not newly reproduced.
-- Explicitly load the official FlyWire FAFB v783 neuron metadata archive and
-  filter actual neuron IDs, source groups, predicted neurotransmitters, and
-  confidence values. The fetched snapshot currently contains 139,255 rows.
-  Neuron IDs remain strings to preserve their full 64-bit precision.
+## Presenter walkthrough
 
-## Evidence and limits
+The in-app **Live demo guide** contains eight buttons that perform the real steps below. Return to that navigation item between steps.
 
-Structural scores do not establish factual accuracy, citation validity, or
-scientific novelty. Citation URLs are counted; they are not fetched or verified.
-No live research engine or LLM judge is connected. Manual answer metadata
-explicitly records `generated_by_app: false`.
+| Step                       | Action                                   | Expected evidence                                                                                                                                                                                           |
+| -------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Introduce AfterThought     | Open introduction                        | The scorer, research notebook, and metadata connector have distinct roles and explicit limits.                                                                                                              |
+| Run a passing example      | Run the authored Python 3.13 answer      | 111 words, one citation, one case passed; regex, citation count, and word count each pass.                                                                                                                  |
+| Show a failing answer      | Run “Python is great.” without citations | Three words; all three checks fail with inspectable details.                                                                                                                                                |
+| Run the mock suite         | Run all ten public cases                 | Ten scored cases, explicitly labeled deterministic mock; the deliberately weak mock passes none overall. Export JSON or Markdown.                                                                           |
+| Query FlyWire              | Find GABA neurons                        | 139,255 total records and 16,017 GABA matches in the currently fetched snapshot. Counts are calculated from source rows.                                                                                    |
+| Inspect one neuron         | Find `720575940598267657`                | One record: group `ME`, predicted transmitter `GABA`, confidence `0.74`. All 18 ID digits remain intact.                                                                                                    |
+| Connect data to evaluation | Run the FlyWire research demo            | A sourced editable brief reports 139,255 total, 16,017 predicted GABA, and a calculated 11.50% share; the unedited draft passes the three scorers. Alter a count or remove a citation, then evaluate again. |
+| Explain the research       | Open The follow-up                       | Einstein’s Jump reports an honest null result on its two fraud-record cases and explains the positive control. Historical findings are attributed, not rerun.                                               |
 
-The FlyWire connector reads one fixed, official
-[v783 archive](https://storage.googleapis.com/flywire-data/codex/data/fafb/783/neurons.csv.gz),
-on an explicit user action or with the optional `--preload-connectome` launch flag. It caches approximately 1.7 MB under ignored
-`.cache/flywire/`, validates compressed/decompressed limits, reuses parsed
-metadata across queries, and repairs corrupt caches with one validated refetch.
-It does not fetch the much larger synaptic graph, simulate neural activity, or
-authenticate to the live Codex/CAVE APIs. This is a static metadata connection.
+These snapshot figures were measured from the official archive. The source-derived brief calculates its expected facts on the server, not from a visible 30-row sample. Its case is separate from `public-10-v1`; it does not change the ten-case suite.
 
-FlyWire data retains **CC BY-NC 4.0** terms. The source code's MIT license does
-not relicense the downloaded dataset. See the
-[FlyWire use and citation guidelines](https://join.flywire.ai/guidelines) and
-[official Codex loader](https://github.com/murthylab/codex/blob/main/codex/data/local_data_loader.py).
-Downloaded data is not bundled or committed. The external
-[Codex explorer](https://codex.flywire.ai/app/explore) requires sign-in.
+## Working with answers and reports
 
-Geist font files are from Google Fonts, copyright the Geist Project Authors,
-and are bundled under the [SIL Open Font License](fonts/OFL.txt). The small
-neuron diagram is an original schematic illustration, not measured connectivity.
+Browse or filter the ten public cases across nine category labels. Selecting a row reveals its question, regex rules, citation minimum, length minimum, and unexecuted judge rubric. Paste an answer and HTTP(S) citation URLs, one per line, then choose **Evaluate answer**.
+
+Reports preserve the actual runner output and distinguish manual answers, deterministic mock output, and source-derived evidence evaluations. **Evaluation runs** retains up to 30 reports in browser memory. Use the report’s JSON or Markdown export to keep evidence; reloading clears run history and answer drafts. The server does not store submitted answers.
+
+The FlyWire brief joins the two working systems: complete source metadata supplies counts and a calculated fraction; a deterministic template supplies an editable draft; the existing `RegexScorer`, `CitationCountScorer`, and `WordCountScorer` evaluate the submitted text. No new AI model or hidden judge is involved.
+
+## Meaning and limits
+
+A passing structural score does not establish factual correctness, valid citations, sound reasoning, or scientific novelty. Regex checks can match repeated terms without understanding them. Citation URLs are counted, not fetched or verified. The word scorer splits on whitespace. No live research engine or LLM judge is connected, and manual submissions retain `generated_by_app: false` metadata.
+
+Einstein’s Jump supplies a seven-phase research notebook with links to its original evidence. Its bounded historical findings do not establish a universal theorem about creativity or judges.
+
+FlyWire results are **static metadata**, not live neural activity. A source group such as `ME` is a source grouping, not an invented cell-type name. Transmitter labels and confidence values are predictions. The app does not fetch the large synaptic graph, simulate neural activity, authenticate to CAVE, or use a fly brain to reason.
+
+## Dataset access and licensing
+
+The connector reads one fixed official [FAFB v783 neuron archive](https://storage.googleapis.com/flywire-data/codex/data/fafb/783/neurons.csv.gz). The first explicit load or preload retrieves approximately 1.7 MB; subsequent requests use ignored `.cache/flywire/`. A valid local cache works offline. Downloads are limited to 4 MB compressed, 40 MB decoded, and 200,000 parsed records for this fixed snapshot. One immutable parsed snapshot is shared across query threads and invalidated when the cache file changes. A corrupt cache triggers one validated refetch before atomic replacement; an invalid replacement is not published.
+
+Raw data is not bundled or committed. **CC BY-NC 4.0** applies to the FlyWire data independently of the source code’s MIT license. Follow the [official citation guidelines](https://join.flywire.ai/guidelines) and preserve the applicable dataset attribution. The [official Codex loader](https://github.com/murthylab/codex/blob/main/codex/data/local_data_loader.py) defines the archive source. The external [Codex explorer](https://codex.flywire.ai/app/explore) requires sign-in; this app’s bounded static download does not use a Codex/CAVE token.
+
+## Recovery during a demo
+
+- **Port occupied:** stop the existing app instance, or restart with `--port 8766` and use the corresponding browser URL.
+- **Dataset unavailable:** use **Load FlyWire snapshot** or **Refresh metadata view** to retry. Check internet access if no valid cache exists. Preload failure does not prevent local scoring from starting.
+- **No matching neurons:** clear the query or choose **All transmitters** and search again. Empty matches are a valid result.
+- **Scoring request refused:** check the visible error. Answers are bounded to 200,000 characters; citations must be HTTP(S) URLs, at most 100, each no longer than 2,048 characters.
+- **Nothing to export:** run an evaluation first. Export before reloading because history is temporary.
+- **Server unavailable:** keep the launcher terminal running. Restart the app, reload the browser, and repeat the demo action.
+
+## HTTP surface
+
+All endpoints are served on the same loopback origin as the UI. No answer or dataset is sent to an AI provider.
+
+| Request                                        | Purpose                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `GET /api/health`                              | Local server status, case count, and whether startup preload succeeded.               |
+| `GET /api/cases`                               | The actual versioned public suite and scoring contracts.                              |
+| `POST /api/run`                                | Evaluate selected public cases in explicit manual or mock mode.                       |
+| `GET /api/connectome?q=&transmitter=&limit=30` | Search real metadata; result limit is 1–100 and neuron IDs remain strings.            |
+| `GET /api/connectome/brief`                    | Calculate source facts and return the separate evidence case and deterministic draft. |
+| `POST /api/connectome/evaluate`                | Score submitted brief text and citations against server-owned snapshot facts.         |
+
+Unexpected Host/cross-origin requests are refused. POST bodies are capped at 1 MB; the server exposes no arbitrary file-write, shell-execution, or user-supplied remote-fetch endpoint.
 
 ## Checks
 
-With the repository's development extra installed:
+For the complete suite, install the development extra and run:
 
 ```text
+python -m pip install -e ".[dev]"
 python -m pytest -q
 ```
 
-The added web and connector checks also run using only the standard library:
+The added app checks use the standard library. Set `PYTHONPATH=src` first, then run:
 
 ```text
-python -m unittest discover -s tests -p test_web.py -v
-python -m unittest discover -s tests -p test_connectome.py -v
+python -m unittest discover -s tests -p "test_web.py" -v
+python -m unittest discover -s tests -p "test_connectome*.py" -v
 ```
 
-For these direct test commands, set `PYTHONPATH=src` in your shell first.
-The web suite exercises the real HTTP server and the existing runner/scorers,
-including manual passes/failures, report contents, explicit mock labeling,
-cross-origin/Host refusal, request bounds, static containment, and fixed errors.
-The connector suite covers actual CSV parsing with fixture archives, precision,
-filters, bounded downloads, corrupt-cache recovery, and concurrent cache reuse.
+In PowerShell, set the path with `$env:PYTHONPATH = "src"`; in a POSIX shell use `export PYTHONPATH=src`.
+
+The web checks exercise the real HTTP server and existing runner/scorers, including manual passes/failures, report contents, explicit mock labels, Host/origin refusal, request bounds, static containment, and fixed errors. Metadata tests cover parsing, full-precision IDs, filtering, bounded downloads, corrupt-cache recovery, and concurrent reuse. Evidence-brief tests cover source-count consistency and meaningful failing answers through the actual scorers. Passing fixtures do not claim actual-provider, neural-simulation, or general scientific correctness.
+
+## Visual and source credits
+
+The Deep Research Bench core retains its [MIT license](../LICENSE) and package namespace; its [framework guide](../docs/framework.md) documents the extension APIs. Research summaries link to Arsh’s [Einstein’s Jump](https://github.com/dnarsh/einsteins-jump).
+
+Geist (Geist Project Authors) and Newsreader (Newsreader Project Authors) are locally bundled under the SIL Open Font License: [Geist license](fonts/OFL.txt), [Newsreader license](fonts/Newsreader-OFL.txt). The neuron graphic is an original schematic, not measured connectivity. The banner and brand assets identify AfterThought; the [repository QR](assets/brand/github-qr.svg) points to <https://github.com/dnarsh/AfterThought>.

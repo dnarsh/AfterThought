@@ -253,6 +253,45 @@ class WebTests(unittest.TestCase):
                 else:
                     preload.assert_not_called()
 
+    def test_connectome_brief_and_evidence_review_use_server_owned_facts(self):
+        from tests.test_connectome_brief import snapshot
+
+        with patch("deep_research_bench.connectome_brief.query_neurons", return_value=snapshot()):
+            status, _, raw = self.request("GET", "/api/connectome/brief")
+            self.assertEqual(status, 200)
+            brief = json.loads(raw)
+            payload = {**brief["answer"], "facts": {"total_neurons": 999}, "case": {"id": "forged"}}
+            status, _, raw = self.request("POST", "/api/connectome/evaluate", json.dumps(payload).encode(), {"Content-Type": "application/json"})
+            self.assertEqual(status, 200)
+            result = json.loads(raw)
+            self.assertEqual(result["case"]["id"], "flywire-gaba-evidence")
+            self.assertEqual(result["facts"]["total_neurons"], 10)
+            self.assertEqual(result["facts"]["gaba_neurons"], 3)
+            self.assertTrue(result["run"]["cells"][0]["passed"])
+            self.assertIn("flywire-evidence-review", result["markdown"])
+            payload["text"] = payload["text"].replace("3 have GABA", "4 have GABA")
+            status, _, raw = self.request("POST", "/api/connectome/evaluate", json.dumps(payload).encode(), {"Content-Type": "application/json"})
+            self.assertEqual(status, 200)
+            self.assertFalse(json.loads(raw)["run"]["cells"][0]["passed"])
+        status, _, raw = self.request("GET", "/api/cases")
+        self.assertEqual(len(json.loads(raw)["cases"]), 10)
+        self.assertNotIn("flywire-gaba-evidence", [case.id for case in self.server.cases])
+
+    def test_evidence_input_validation_precedes_network_and_errors_are_safe(self):
+        with patch("deep_research_bench.connectome_brief.query_neurons", side_effect=RuntimeError("private machine path")) as query:
+            status, _, raw = self.request("POST", "/api/connectome/evaluate", b'{"text":4}', {"Content-Type": "application/json"})
+            self.assertEqual(status, 400)
+            query.assert_not_called()
+            for method, path, body in [
+                ("GET", "/api/connectome/brief", None),
+                ("POST", "/api/connectome/evaluate", b'{"text":"answer","citations":[]}'),
+            ]:
+                with self.subTest(path=path):
+                    status, _, raw = self.request(method, path, body, {"Content-Type": "application/json"})
+                    self.assertEqual(status, 502)
+                    self.assertEqual(json.loads(raw)["error"], "CONNECTOME_UNAVAILABLE")
+                    self.assertNotIn(b"private", raw)
+
 
 if __name__ == "__main__":
     unittest.main()

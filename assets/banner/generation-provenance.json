@@ -1,0 +1,97 @@
+{
+  "generatedUtc": "2026-10-28T05:26:30.794586+00:00",
+  "mode": "built-in image_gen edit, then one targeted annotation cleanup",
+  "source": "assets/banner/afterthought-banner-clean.png",
+  "final": "assets/banner/afterthought-banner.png",
+  "dimensions": [
+    1054,
+    1492
+  ],
+  "sha256": "ba176d05c1f6a33aa109429fdfd9bcf17868b77070fde23b3f2a7889ad0e4e8f",
+  "bytes": 2223277,
+  "copyOnlyPixelsIdentical": true,
+  "promptFiles": [
+    {
+      "path": "assets/banner/prompt.txt",
+      "sha256": "12620211316bddc70fe9fe460b97b2319e25156471e5265f878b63afac2e8617"
+    },
+    {
+      "path": "assets/banner/cleanup-prompt.txt",
+      "sha256": "b1e29d01d0e63137c95e3b28684dd1b35f8698f5579af1bcc2063175f46cbdfc"
+    }
+  ],
+  "qrVerification": {
+    "decoder": "zxing-cpp 3.1.1",
+    "decodedUrl": "https://github.com/dnarsh/AfterThought",
+    "codesFound": 1,
+    "overlayApplied": false
+  },
+  "iconConversion": {
+    "renderer": "resvg-py 0.5.0",
+    "sourceSvg": "web/favicon.svg",
+    "sourceSvgSha256": "b5696fc871f9aec95ef87571d75c1da78b1cdac02f5d09796d6e55b011ac7709",
+    "sourceUnchanged": true,
+    "icoExporter": "Pillow",
+    "outputs": [
+      {
+        "path": "web/assets/brand/favicon-16.png",
+        "dimensions": [
+          16,
+          16
+        ],
+        "sha256": "75300ba6c48c592c4020c832f73dc875d2742595a27ffa51e4f3f1612531e7d7",
+        "bytes": 591
+      },
+      {
+        "path": "web/assets/brand/favicon-32.png",
+        "dimensions": [
+          32,
+          32
+        ],
+        "sha256": "d035d7f957790fdbe64da90260d3c98b9c35bbfc784e94172bcd92f4b418283c",
+        "bytes": 1159
+      },
+      {
+        "path": "web/assets/brand/apple-touch-icon.png",
+        "dimensions": [
+          180,
+          180
+        ],
+        "sha256": "4484e8b42e73ea8ba4e5d893f7b6799a485461292b5f691f9bea186f2915ecb2",
+        "bytes": 6008
+      },
+      {
+        "path": "web/assets/brand/favicon.ico",
+        "sizes": [
+          [
+            16,
+            16
+          ],
+          [
+            32,
+            32
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ]
+        ],
+        "sha256": "2794ef0872bfd736a70c02100c7f9ccc977d45194a92e3c6b53785d36474d879",
+        "bytes": 29467
+      }
+    ]
+  },
+  "limits": "Generated college emblem and main copy visually inspected; no print-production qualification. Banner pixels unchanged after QR verification."
+}

@@ -69,11 +69,21 @@ const state = {
   neuronBusy: false,
   neuronError: "",
   preloaded: false,
+  brief: null,
+  briefText: "",
+  briefCitations: "",
+  briefReport: null,
+  briefBusy: false,
+  briefError: "",
 };
 const fmt = (n) => Number(n).toLocaleString();
 const title = (c) => titles[c.id] || c.id;
 const modeLabel = (mode) =>
-  mode === "mock" ? "Deterministic mock" : "Manual answer";
+  ({
+    mock: "Deterministic mock",
+    manual: "Manual answer",
+    evidence: "FlyWire evidence review",
+  })[mode] || "Evaluation";
 const currentCase = () => state.cases.find((c) => c.id === state.active);
 const currentCell = (id) => state.run?.run.cells.find((c) => c.case_id === id);
 const draft = (id) => (state.answers[id] ||= { text: "", citations: "" });
@@ -258,18 +268,25 @@ function renderGuide() {
       "Open the follow-up",
     ],
   ];
-  return `${heading("Live demo guide", "A 5–7 minute walkthrough. Use the buttons to run each real step.", '<button data-action="go-overview">Project introduction</button>')}
+  steps.splice(6, 0, [
+    "Turn neuron data into research evidence",
+    "Build a research brief from the actual FlyWire counts, computed fraction and official source. Evaluate the draft, then edit a count or remove a citation to expose a failed check.",
+    "Expected: a source-derived brief with 139,255 total records, 16,017 predicted GABA records and an 11.50% share; its unedited draft passes all three structural scorers. This is data analysis, not brain reasoning.",
+    "demo-brief",
+    "Run the FlyWire research demo",
+  ]);
+  return `${heading("Live demo guide", "A 6–8 minute walkthrough. Use the buttons to run each real step.", '<button data-action="go-overview">Project introduction</button>')}
   <section class="panel synopsis"><h2>Your 30-second synopsis</h2><p>AfterThought turns research claims into inspectable evidence. It combines a transparent evaluation framework, a notebook about the limits of AI judging, and a searchable connection to published FlyWire neuron metadata. Every score and dataset count has a visible source and a clear boundary.</p><p><strong>Before presenting:</strong> keep this localhost server running. The Windows launcher preloads FlyWire; without it, use <code>python run_app.py --preload-connectome</code>. No provider keys are needed. The first download requires internet; a valid local cache works afterward.</p></section>
   <ol class="guide-list">${steps.map(([name, say, expected, action, label]) => `<li class="panel guide-step"><h2>${esc(name)}</h2><p>${esc(say)}</p><p class="expected"><strong>What to show:</strong> ${esc(expected)}</p><button class="primary" data-action="${action}">${icon("play")}${esc(label)}</button></li>`).join("")}</ol>
-  <section class="panel synopsis"><h2>If something is unavailable</h2><p>For a dataset error, retry in FlyWire connectome and check the internet connection. The scoring demo needs no network. If there is no report to export, run an evaluation first. Use the Live demo guide navigation item to return here after each step.</p><button data-action="export-json" ${state.run ? "" : "disabled"}>${icon("download")}Export the latest result</button></section>`;
+  <section class="panel synopsis"><h2>If something is unavailable</h2><p>For a dataset error, retry in FlyWire connectome and check the internet connection. The scoring demo needs no network. If there is no report to export, run an evaluation first. Use the Live demo guide navigation item to return here after each step.</p><button data-action="export-json" ${state.history.length ? "" : "disabled"}>${icon("download")}Export the latest result</button></section>`;
 }
 function renderOverview() {
   const d = state.connectome;
-  return `${heading("AfterThought", "An evidence workspace by Arsh Talkhani.", '<button class="primary" data-action="demo-score">' + icon("play") + "Start scoring demo</button>")}
+  return `${heading("AfterThought", "An evidence workspace by Arsh.", '<button class="primary" data-action="demo-score">' + icon("play") + "Start scoring demo</button>")}
   <section class="panel overview-lead"><h2>From an answer to evidence.</h2><p>AI-generated research can sound convincing while missing the question, the sources, or the substance. AfterThought makes those expectations explicit, runs reproducible checks, and shows the reason behind every score.</p><p>This app brings together three pieces of work: the <strong>Deep Research Bench</strong> evaluation framework, the <strong>Einstein’s Jump</strong> investigation into judging novelty, and a real connection to the published <strong>FlyWire fly-brain metadata</strong>.</p><ol class="workflow"><li><strong>Choose a question</strong><span>Inspect a versioned case and its scoring rules.</span></li><li><strong>Evaluate an answer</strong><span>Run the actual regex, citation and length checks.</span></li><li><strong>Inspect the evidence</strong><span>Review each result and export the full report.</span></li></ol></section>
   <div class="overview-grid"><section class="panel demo-card"><h2>A live research evaluation</h2><p>Score the supplied Python 3.13 example against the actual benchmark. Then shorten the answer or remove its citation and evaluate again to see which checks change.</p><div class="demo-actions"><button class="primary" data-action="demo-score">${icon("play")}Evaluate the example</button><button data-action="demo-fail">Show a failing answer</button></div><small>No AI response is generated. The example is authored demonstration text; scoring runs live in Python.</small></section>
   <section class="panel demo-card"><h2>A real fly-connectome connection</h2><p>A connectome maps neural wiring. FlyWire’s published adult fruit-fly dataset also provides neuron metadata. Here you can search exact neuron IDs, explore source groups, and compare predicted transmitter counts.</p><div class="demo-actions"><button class="primary" data-action="demo-neurons">${icon("network")}Find GABA neurons</button><a class="external-link" href="#connectome">Open metadata explorer ↗</a></div><small>${d ? `${fmt(d.total_neurons)} real records loaded from FAFB v783.` : state.preloaded ? "The published snapshot is preloaded on this server." : "The snapshot loads on demand; use --preload-connectome before a demo."} CC BY-NC 4.0; cached locally.</small></section></div>
-  <section class="panel synopsis"><h2>What the work shows</h2><p><strong>Evaluation:</strong> ten public cases make research-answer structure measurable. Passing these checks does not prove the facts or citations are correct.</p><p><strong>Novelty:</strong> Einstein’s Jump documents seven phases of experiments, negative results and methodological limits. A confident judge is not a certificate of a new discovery.</p><p><strong>Connectomics:</strong> this app actively filters and summarizes real published neuron records. It does not load synaptic edges, run a neural model, simulate a fly, or use a brain to reason. Those would require a separate, validated simulation pipeline.</p><a class="external-link" href="#research">Inspect the research synopsis and original experiments ${icon("arrow")}</a></section>`;
+  <section class="panel synopsis"><h2>What the work shows</h2><p><strong>Evaluation:</strong> ten public cases make research-answer structure measurable. Passing these checks does not prove the facts or citations are correct.</p><p><strong>Novelty:</strong> Einstein’s Jump documents seven phases of experiments, negative results and methodological limits. A confident judge is not a certificate of a new discovery.</p><p><strong>Connectomics:</strong> this app actively filters and summarizes real published neuron records. It does not load synaptic edges, run a neural model, simulate a fly, or use a brain to reason. Those would require a separate, validated simulation pipeline.</p><a class="external-link" href="#research">Inspect the research synopsis and original experiments ${icon("arrow")}</a><div class="project-qr"><img src="/assets/brand/github-qr.svg" alt="QR code for the AfterThought GitHub repository" width="76" height="76"><p>Built by Arsh · Reg. No. 476CS24010<br><a href="https://github.com/dnarsh/AfterThought" target="_blank" rel="noopener noreferrer">Explore AfterThought on GitHub ↗</a></p></div></section>`;
 }
 function renderBenchmark() {
   const cells = state.run?.run.cells || [],
@@ -333,7 +350,7 @@ function renderDetail() {
   }</div>`;
 }
 function renderRuns() {
-  return `${heading("Evaluation runs", "A transparent record of this browser session.", `<button data-action="export-md" ${state.run ? "" : "disabled"}>${icon("download")}Export Markdown</button>`)}<div class="run-list">${
+  return `${heading("Evaluation runs", "A transparent record of this browser session.", `<button data-action="export-md" ${state.history.length ? "" : "disabled"}>${icon("download")}Export Markdown</button>`)}<div class="run-list">${
     state.history.length
       ? state.history
           .map((r, i) => {
@@ -369,7 +386,71 @@ function neuronIllustration() {
 function renderConnectome() {
   const d = state.connectome;
   return `${heading("FlyWire connectome", "Explore real neuron metadata from the published FAFB v783 snapshot.")}<section class="panel connectome-intro"><div><h2>A brain, in inspectable detail.</h2><p>Connect to FlyWire’s public static archive and browse neuron IDs, source groups, predicted neurotransmitters and confidence. Data is retrieved by this local server, without an API key.</p><button class="primary" data-action="load-neurons" ${state.neuronBusy ? "disabled" : ""}>${state.neuronBusy ? '<span class="spinner"></span>' : icon("network")}${state.neuronBusy ? "Loading published snapshot…" : d ? "Refresh metadata view" : "Load FlyWire snapshot"}</button><div class="provenance">FlyWire FAFB v783 · <a href="https://join.flywire.ai/guidelines" target="_blank" rel="noopener noreferrer">CC BY-NC 4.0</a> · <a href="https://codex.flywire.ai/app/explore" target="_blank" rel="noopener noreferrer">Open Codex ↗</a></div></div><div class="neuron-glyph">${neuronIllustration()}</div></section>${state.neuronError ? `<div class="error-box" role="alert">${esc(state.neuronError)}</div>` : ""}
-  ${d ? `<div class="metric-strip">${metric("Neurons in snapshot", fmt(d.total_neurons), "Actual rows in the published archive")}${metric("Matching neurons", fmt(d.matching_neurons), "Current search and transmitter filter")}${metric("Transmitter labels", d.neurotransmitters.length, "Includes unknown predictions")}${metric("Dataset version", "783", "Static snapshot · not live activity")}</div><div class="connectome-grid"><section class="panel distribution"><h2>Predicted transmitters</h2>${d.neurotransmitters.map((t, i) => `<div class="distribution-row"><div class="line"><span>${esc(t.name)}</span><span class="num">${fmt(t.count)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(t.count / d.total_neurons) * 100}%;${i ? "background:#8a96a6" : ""}"></div></div></div>`).join("")}<p class="dataset-notice">Counts describe the entire metadata snapshot. Predictions do not measure neural firing or behavior.</p></section><section class="panel"><div class="panel-header"><div><h2>Neuron explorer</h2><small>Source identifiers are preserved without rounding.</small></div><span class="subtle-tag">${d.neurons.length} shown</span></div><form id="neuron-form" class="filter-row"><label class="search">${icon("search")}<input id="neuron-search" placeholder="Neuron ID or group…" aria-label="Search neuron ID or group" value="${esc(state.neuronQuery)}"></label><select id="transmitter-filter" aria-label="Predicted transmitter"><option value="">All transmitters</option>${d.neurotransmitters.map((t) => `<option ${state.transmitter === t.name ? "selected" : ""} value="${esc(t.name)}">${esc(t.name)}</option>`).join("")}</select><button type="submit" ${state.neuronBusy ? "disabled" : ""}>Search</button></form><table class="case-table neuron-table"><thead><tr><th>Neuron ID</th><th>Group</th><th>Transmitter</th><th>Confidence</th></tr></thead><tbody>${d.neurons.length ? d.neurons.map((n) => `<tr><td class="mono">${esc(n.id)}</td><td>${esc(n.group || "—")}</td><td>${esc(n.neurotransmitter)}</td><td class="num">${n.confidence == null ? "—" : Number(n.confidence).toFixed(2)}</td></tr>`).join("") : '<tr><td colspan="4"><div class="empty">No matching neurons. Try another ID or group.</div></td></tr>'}</tbody></table><div class="panel-foot"><span>First ${d.neurons.length} of ${fmt(d.matching_neurons)} matches</span><a href="${esc(d.source_url)}" target="_blank" rel="noopener noreferrer">Source archive ↗</a></div></section></div>` : `<section class="panel empty"><h2>The published data is one click away.</h2><p>The first load retrieves about 1.7 MB. Following searches use the local cache.</p></section>`}<div class="scoring-note">${icon("info")}<div><strong>Real metadata, clearly bounded.</strong>This is a static dataset connection, not a whole-brain simulation, synaptic connectivity viewer or live FlyWire API. Codex’s interactive explorer requires sign-in. Data is cached locally and retains its non-commercial license.</div></div>`;
+  ${d ? `<div class="metric-strip">${metric("Neurons in snapshot", fmt(d.total_neurons), "Actual rows in the published archive")}${metric("Matching neurons", fmt(d.matching_neurons), "Current search and transmitter filter")}${metric("Transmitter labels", d.neurotransmitters.length, "Includes unknown predictions")}${metric("Dataset version", "783", "Static snapshot · not live activity")}</div><div class="connectome-grid"><section class="panel distribution"><h2>Predicted transmitters</h2>${d.neurotransmitters.map((t, i) => `<div class="distribution-row"><div class="line"><span>${esc(t.name)}</span><span class="num">${fmt(t.count)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(t.count / d.total_neurons) * 100}%;${i ? "background:#899d80" : ""}"></div></div></div>`).join("")}<p class="dataset-notice">Counts describe the entire metadata snapshot. Predictions do not measure neural firing or behavior.</p></section><section class="panel"><div class="panel-header"><div><h2>Neuron explorer</h2><small>Source identifiers are preserved without rounding.</small></div><span class="subtle-tag">${d.neurons.length} shown</span></div><form id="neuron-form" class="filter-row"><label class="search">${icon("search")}<input id="neuron-search" placeholder="Neuron ID or group…" aria-label="Search neuron ID or group" value="${esc(state.neuronQuery)}"></label><select id="transmitter-filter" aria-label="Predicted transmitter"><option value="">All transmitters</option>${d.neurotransmitters.map((t) => `<option ${state.transmitter === t.name ? "selected" : ""} value="${esc(t.name)}">${esc(t.name)}</option>`).join("")}</select><button type="submit" ${state.neuronBusy ? "disabled" : ""}>Search</button></form><table class="case-table neuron-table"><thead><tr><th>Neuron ID</th><th>Group</th><th>Transmitter</th><th>Confidence</th></tr></thead><tbody>${d.neurons.length ? d.neurons.map((n) => `<tr><td class="mono">${esc(n.id)}</td><td>${esc(n.group || "—")}</td><td>${esc(n.neurotransmitter)}</td><td class="num">${n.confidence == null ? "—" : Number(n.confidence).toFixed(2)}</td></tr>`).join("") : '<tr><td colspan="4"><div class="empty">No matching neurons. Try another ID or group.</div></td></tr>'}</tbody></table><div class="panel-foot"><span>First ${d.neurons.length} of ${fmt(d.matching_neurons)} matches</span><a href="${esc(d.source_url)}" target="_blank" rel="noopener noreferrer">Source archive ↗</a></div></section></div>` : `<section class="panel empty"><h2>The published data is one click away.</h2><p>The first load retrieves about 1.7 MB. Following searches use the local cache.</p></section>`}${renderBriefPanel()}<div class="scoring-note">${icon("info")}<div><strong>Real metadata, clearly bounded.</strong>This is a static dataset connection, not a whole-brain simulation, synaptic connectivity viewer or live FlyWire API. Codex’s interactive explorer requires sign-in. Data is cached locally and retains its non-commercial license.</div></div>`;
+}
+function renderBriefPanel() {
+  const b = state.brief,
+    result = state.briefReport?.run.cells[0];
+  return `<section class="panel brief-panel" aria-labelledby="brief-title"><h2 id="brief-title">From neuron data to a research answer</h2><p>Use the real snapshot as evidence. Build a sourced brief, inspect the facts, edit the answer, and evaluate it with the same transparent scoring framework used by the benchmark.</p><button class="primary" data-action="build-brief" ${state.briefBusy ? "disabled" : ""}>${state.briefBusy ? '<span class="spinner"></span>' : icon("book")}${b ? "Reset brief from source data" : "Build a FlyWire research brief"}</button>${state.briefError ? `<div class="error-box" role="alert">${esc(state.briefError)}</div>` : ""}
+  ${
+    b
+      ? `<div class="brief-facts"><div><strong>${fmt(b.facts.total_neurons)}</strong><small>Snapshot neurons</small></div><div><strong>${fmt(b.facts.gaba_neurons)}</strong><small>Predicted GABA neurons</small></div><div><strong>${Number(b.facts.percentage).toFixed(2)}%</strong><small>Share of the snapshot</small></div></div><p class="brief-question">${esc(b.case.query)}</p><div class="brief-grid"><form id="brief-form"><label class="form-label" for="brief-text">Evidence brief <small>Editable; derived from the dataset</small></label><textarea id="brief-text" class="answer-input brief-input" maxlength="200000" required>${esc(state.briefText)}</textarea><p class="form-help">A deterministic data summary, not an AI-generated answer or brain reasoning.</p><label class="form-label" for="brief-citations">Source citations</label><textarea id="brief-citations" class="citation-input">${esc(state.briefCitations)}</textarea><button class="primary" type="submit" ${state.briefBusy ? "disabled" : ""}>${icon("check")}Evaluate research brief</button></form><aside class="brief-checks"><h3>Inspect the evidence</h3><p>Checks cover the actual snapshot counts, computed percentage, version, prediction limits, citation count and length. The public ten-case suite stays separate.</p>${
+          result
+            ? `${status(result)}${Object.entries(result.scorers)
+                .map(
+                  ([name, s]) =>
+                    `<div class="score-line"><span class="score-icon ${s.passed ? "" : "fail"}">${icon(s.passed ? "check" : "cross")}</span>${esc(name)}<span>${Math.round(s.score * 100)}%</span></div><details><summary>Inspect ${esc(name)} details</summary><p class="details-copy">${esc(s.detail)}</p></details>`,
+                )
+                .join(
+                  "",
+                )}<div class="actions"><button data-action="brief-json">${icon("download")}JSON</button><button data-action="brief-md">Markdown</button></div>`
+            : "<p>Build the brief, then evaluate it to see real check results here.</p>"
+        }<p>Citation count does not verify source quality. Passing these structural checks does not certify factual truth.</p></aside></div>`
+      : ""
+  }</section>`;
+}
+async function buildBrief(evaluateAfter = false) {
+  if (state.briefBusy) return;
+  state.briefBusy = true;
+  state.briefError = "";
+  render();
+  try {
+    state.brief = await api("/api/connectome/brief");
+    state.briefText = state.brief.answer.text;
+    state.briefCitations = state.brief.answer.citations.join("\n");
+    state.briefReport = null;
+  } catch (e) {
+    state.briefError = e.message;
+  } finally {
+    state.briefBusy = false;
+    render();
+  }
+  if (evaluateAfter && state.brief && !state.briefError) await evaluateBrief();
+}
+async function evaluateBrief() {
+  if (state.briefBusy || !state.brief) return;
+  if (!state.briefText.trim()) return toast("Enter an evidence brief first.");
+  state.briefBusy = true;
+  state.briefError = "";
+  render();
+  try {
+    const r = await api("/api/connectome/evaluate", {
+      text: state.briefText,
+      citations: state.briefCitations
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
+    state.briefReport = r;
+    state.history.unshift(r);
+    state.history = state.history.slice(0, 30);
+    toast("FlyWire evidence evaluated with the actual research scorers.");
+  } catch (e) {
+    state.briefError = e.message;
+  } finally {
+    state.briefBusy = false;
+    render();
+  }
 }
 async function evaluate(mode) {
   if (state.busy) return;
@@ -405,12 +486,10 @@ async function evaluate(mode) {
     render();
   }
 }
-function download(format) {
-  if (!state.run) return;
+function download(format, entry = state.run) {
+  if (!entry) return;
   const content =
-    format === "json"
-      ? JSON.stringify(state.run.run, null, 2)
-      : state.run.markdown;
+    format === "json" ? JSON.stringify(entry.run, null, 2) : entry.markdown;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(
     new Blob([content], {
@@ -418,7 +497,7 @@ function download(format) {
         format === "json" ? "application/json" : "text/markdown;charset=utf-8",
     }),
   );
-  a.download = `afterthought-${state.run.mode}-${Date.now()}.${format === "json" ? "json" : "md"}`;
+  a.download = `afterthought-${entry.mode}-${Date.now()}.${format === "json" ? "json" : "md"}`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   toast("Report exported.");
@@ -442,6 +521,8 @@ async function loadNeurons() {
 const sampleAnswer =
   "Python 3.13 introduced several important improvements. First, its new interactive REPL supports multiline editing, colored prompts, help browsing, and a paste mode, making interactive work more convenient. Second, experimental free-threaded builds can run with the global interpreter lock disabled, allowing suitable threaded programs to use multiple CPU cores. This is an optional build, not the behavior of the standard interpreter. Third, an experimental JIT compiler is available as an opt-in build feature; it is not enabled by default. Other changes include clearer colored tracebacks, defined semantics for the locals() mapping, and default values for type parameters. These are release features rather than a guarantee that every existing application will run faster.";
 document.addEventListener("input", (e) => {
+  if (e.target.id === "brief-text") state.briefText = e.target.value;
+  if (e.target.id === "brief-citations") state.briefCitations = e.target.value;
   if (e.target.id === "answer-text") {
     draft(state.active).text = e.target.value;
     $("#word-count").textContent = e.target.value.trim()
@@ -474,6 +555,10 @@ document.addEventListener("change", (e) => {
   }
 });
 document.addEventListener("submit", (e) => {
+  if (e.target.id === "brief-form") {
+    e.preventDefault();
+    evaluateBrief();
+  }
   if (e.target.id === "answer-form") {
     e.preventDefault();
     evaluate("manual");
@@ -501,6 +586,13 @@ document.addEventListener("click", (e) => {
   }
   const run = e.target.closest("[data-run]");
   if (run) {
+    const selectedRun = state.history[Number(run.dataset.run)];
+    if (selectedRun.mode === "evidence") {
+      state.briefReport = selectedRun;
+      location.hash = "connectome";
+      render();
+      return;
+    }
     state.run = state.history[Number(run.dataset.run)];
     state.active = state.run.run.cells[0].case_id;
     location.hash = "benchmark";
@@ -508,6 +600,14 @@ document.addEventListener("click", (e) => {
     return;
   }
   const action = e.target.closest("[data-action]")?.dataset.action;
+  if (action === "build-brief") buildBrief();
+  if (action === "brief-json") download("json", state.briefReport);
+  if (action === "brief-md") download("md", state.briefReport);
+  if (action === "demo-brief") {
+    location.hash = "connectome";
+    render();
+    buildBrief(true);
+  }
   if (action === "go-overview") location.hash = "overview";
   if (action === "demo-suite") {
     state.selected = new Set(state.cases.map((c) => c.id));
@@ -547,8 +647,13 @@ document.addEventListener("click", (e) => {
     loadNeurons();
   }
   if (action === "run-demo") evaluate("mock");
-  if (action === "export-json") download("json");
-  if (action === "export-md") download("md");
+  if (action === "export-json")
+    download(
+      "json",
+      ["guide", "runs"].includes(state.view) ? state.history[0] : state.run,
+    );
+  if (action === "export-md")
+    download("md", state.view === "runs" ? state.history[0] : state.run);
   if (action === "go-bench") location.hash = "benchmark";
   if (action === "load-neurons") loadNeurons();
   if (action === "sample") {

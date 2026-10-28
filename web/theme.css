@@ -1,0 +1,373 @@
+@font-face {
+  font-family: Newsreader;
+  src: url("/fonts/Newsreader-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Ivory, dark olive and restrained copper, as requested for AfterThought. */
+:root {
+  color-scheme: light;
+  --ground: #f4efe5;
+  --surface: #fffaf1;
+  --raised: #e8e6d9;
+  --active: #dce0d0;
+  --border: #d9d4c6;
+  --rule: #e6dfd1;
+  --control: #7e8974;
+  --text: #253529;
+  --muted: #59614f;
+  --faint: #67705d;
+  --primary: #283e2c;
+  --accent: #9b5d3c;
+  --positive: #3a6838;
+  --negative: #a3432d;
+  --copper-hover: #854c30;
+  --on-copper: #fff7e9;
+  --radius-card: 6px;
+  --radius-control: 4px;
+}
+
+body {
+  background: var(--ground);
+}
+button,
+input,
+select,
+textarea {
+  border-radius: var(--radius-control);
+}
+button {
+  background: transparent;
+}
+.primary {
+  color: var(--on-copper);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.primary:hover:not(:disabled) {
+  background: var(--copper-hover);
+  border-color: var(--copper-hover);
+}
+.brand {
+  font-family: Newsreader, Georgia, serif;
+  font-size: 25px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  gap: 12px;
+  padding: 0 4px;
+}
+.brand img {
+  width: 36px;
+  height: 40px;
+}
+.brand small {
+  font-family: var(--font);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 5px;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+h1 {
+  font-family: Newsreader, Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+.overview-lead h2 {
+  font-family: Newsreader, Georgia, serif;
+  font-size: 31px;
+  font-weight: 400;
+  letter-spacing: -0.45px;
+}
+.synopsis h2,
+.demo-card h2,
+.research-article h2,
+.connectome-intro h2 {
+  font-family: Newsreader, Georgia, serif;
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1.25;
+}
+.page-heading {
+  margin-bottom: 28px;
+}
+.panel,
+.metric-strip,
+.overview-lead,
+.demo-card,
+.scoring-note {
+  border-color: var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.overview-lead {
+  padding: 30px 32px;
+}
+.workflow > li {
+  background: var(--raised);
+  border-radius: 3px;
+}
+.metric-value {
+  color: var(--text);
+  font-weight: 400;
+}
+.case-row:hover {
+  background: var(--raised);
+}
+.case-row.selected {
+  background: #e6e7d9;
+}
+.case-row.selected .case-title {
+  color: #854c30;
+}
+.answer-input,
+.citation-input,
+.search input {
+  background: transparent;
+  color: var(--text);
+}
+.answer-input,
+.citation-input {
+  border-color: var(--control);
+}
+.search {
+  background: #f7f2e9;
+  border-color: var(--control);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--faint);
+  opacity: 1;
+}
+.avatar {
+  background: #dce2d0;
+  color: var(--text);
+}
+.local-dot {
+  background: var(--positive);
+}
+.check-box:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.check-box:checked::after {
+  border-color: var(--on-copper);
+}
+.check-box {
+  border-color: var(--control);
+}
+.status i {
+  background: #78836f;
+}
+.bar-fill {
+  background: var(--accent);
+}
+.bar-fill.comparison {
+  background: #6a795e;
+}
+.error-box {
+  background: #fff0e4;
+  border-color: #b8795f;
+  color: #a3432d;
+}
+.spinner {
+  border-color: #78866f;
+  border-top-color: var(--accent);
+}
+.skip-link {
+  background: var(--surface);
+  color: var(--text);
+}
+#toast {
+  background: var(--text);
+  color: var(--ground);
+}
+.source-link:hover,
+.external-link:hover {
+  color: #854c30;
+}
+.neuron-glyph svg g:first-child {
+  stroke: #65785f;
+}
+.neuron-glyph svg g:nth-child(2) {
+  fill: var(--surface);
+  stroke: #a6b29a;
+}
+.neuron-glyph svg > circle {
+  stroke: var(--accent);
+  fill: var(--surface);
+}
+.neuron-glyph svg > circle:last-of-type {
+  fill: var(--accent);
+}
+.neuron-glyph text {
+  fill: var(--muted);
+}
+.research-article .article-callout {
+  border-color: var(--accent);
+}
+.brand-credit {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.project-qr {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.project-qr img {
+  width: 76px;
+  height: 76px;
+  border-radius: 3px;
+}
+.project-qr p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.project-qr a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.brief-panel {
+  margin-top: 22px;
+  padding: 24px 28px;
+}
+.brief-panel > p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 90ch;
+  margin: 10px 0 18px;
+}
+.brief-question {
+  border-left: 2px solid var(--accent);
+  padding-left: 15px;
+  margin: 19px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.brief-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 24px;
+  margin-top: 20px;
+}
+.brief-input {
+  min-height: 225px;
+}
+.brief-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 20px 0;
+  background: var(--raised);
+  border-radius: 3px;
+}
+.brief-facts > div {
+  padding: 14px 17px;
+  border-right: 1px solid var(--border);
+}
+.brief-facts > div:last-child {
+  border: 0;
+}
+.brief-facts strong {
+  display: block;
+  font-weight: 500;
+  font-size: 23px;
+  font-variant-numeric: tabular-nums;
+}
+.brief-facts small {
+  font-size: 11px;
+}
+.brief-checks {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.brief-checks > p {
+  margin: 8px 0 15px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.brief-checks .actions {
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.brief-checks .actions button {
+  font-size: 11px;
+}
+@media (max-width: 1000px) {
+  .brand {
+    font-size: 24px;
+  }
+  .brand img {
+    width: 30px;
+    height: 33px;
+  }
+  .brief-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 740px) {
+  h1 {
+    font-size: 28px;
+  }
+  .overview-lead h2 {
+    font-size: 27px;
+  }
+  .synopsis h2,
+  .demo-card h2,
+  .research-article h2,
+  .connectome-intro h2 {
+    font-size: 24px;
+  }
+  .overview-lead {
+    padding: 23px 19px;
+  }
+  .brief-panel {
+    padding: 20px 18px;
+  }
+  .brief-facts {
+    grid-template-columns: 1fr;
+  }
+  .brief-facts > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brief-facts strong {
+    font-size: 22px;
+  }
+}
+
+/* Ivory carries the workspace; the introduction keeps one quiet olive field. */
+.overview-lead {
+  background: #263c2d;
+  border-color: #263c2d;
+}
+.overview-lead h2 {
+  color: #fff7e9;
+}
+.overview-lead p {
+  color: #e3e5d6;
+}
+.overview-lead .workflow > li {
+  background: #344d39;
+  color: #e0e4d2;
+}
+.overview-lead .workflow > li strong {
+  color: #fff7e9;
+}
+.overview-lead :focus-visible {
+  outline-color: #f4efe5;
+}

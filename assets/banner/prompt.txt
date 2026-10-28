@@ -1,0 +1,33 @@
+Use case: text-localization and style-transfer.
+Asset type: complete portrait academic project exhibition poster, refined editorial print design, approximately the portrait proportions of input1 (904x1280). Final full-bleed poster image, straight-on flat artwork, not a photographed mockup.
+
+Input1 is the EDIT TARGET: existing M S Ramaiah Polytechnic NeuroSim college poster. Preserve the recognizable college emblem and college header identity from its upper part, preserving its institutional wording, and preserve the department-head identity SMT. B. S. USHA. Replace the entire project identity, imagery, student, technologies and composition as specified below. Input2 is a SUPPORTING INSERT: a verified GitHub QR code. Insert input2 intact in a crisp parchment-light square near bottom-right with generous quiet zone. Do not stylize or alter its square grid; prioritize exactness.
+
+Art direction: premium, elegant wabi-sabi exhibition poster. Matte deep dark olive-black field, restrained warm copper ink and parchment typography. Subtle handmade paper patina, organic imperfection in material only, very legible clean typography. Calm spacious editorial hierarchy. Large sophisticated serif title "AfterThought" near upper-middle, generous breathing room. Small precise sans-serif metadata. Use fine copper hairlines sparingly. Sparse etched neuron branch, tapering like a scientific engraving, merging into research notes/evidence annotations in the middle-right; restrained, not a brain simulation. The etched branch must support the text rather than obscure it. No glowing networks, neon, circuit brain, 3D lettering, blue/copper sci-fi, gradients, decorative tech icons, or generic AI aesthetic. Wabi-sabi texture is subtle, never dirt on letters. Do not preserve original giant block letters or brain illustration.
+
+Layout:
+Top institutional band: original college emblem with "M S RAMAIAH POLYTECHNIC" and the department/year lines. Header should look appropriate and respectful, with ample margin.
+Hero: large "AfterThought" serif wordmark, exact capitalization A and T. Directly below "Evidence before confidence."
+Middle: the three-area descriptor and a concise readable project explanation. Sparse neuron-and-notes engraving can occupy middle-right while text remains on left.
+Lower area: student, accurate technologies, and FlyWire data note. Bottom left department head. Bottom right QR and readable GitHub URL. No clipping, cropped words, broken lines, misspellings, duplicated sections or tiny unreadable text.
+
+All text below is VERBATIM, reproduce each line accurately once. Case may follow exact provided copy. Do not add unrequested claims:
+"M S RAMAIAH POLYTECHNIC"
+"Department of Computer Science and Engineering (CSE)"
+"5th Semester · 3rd Year"
+"AfterThought"
+"Evidence before confidence."
+"Research evaluation · Experiment notes · FlyWire metadata"
+"Evaluate research answers with transparent checks. Explore real neuron data. Inspect every result."
+"Arsh"
+"Reg. No. 476CS24010"
+"Python · HTML / CSS / JavaScript"
+"Local-first web app · Git & GitHub"
+"139,255 FlyWire v783 neuron records"
+"Metadata exploration, not a brain simulation."
+"Department Head"
+"SMT. B. S. USHA"
+"GitHub · Scan to explore"
+"github.com/dnarsh/AfterThought"
+
+Strict invariants: student ONLY Arsh, register476CS24010. No NeuroSim, Sreerevanth, signal simulation, NumPy, SciPy, Matplotlib, Jupyter or brain-simulation claim. No fake screenshots or test-results claim. Keep all content at a readable exhibition scale. One complete finished poster.
