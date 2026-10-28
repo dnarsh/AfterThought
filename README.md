@@ -1,4 +1,5 @@
 # AfterThought
+[![tests](https://github.com/dnarsh/AfterThought/actions/workflows/tests.yml/badge.svg)](https://github.com/dnarsh/AfterThought/actions/workflows/tests.yml)
 
 ![AfterThought — evidence before confidence](assets/banner/afterthought-banner-final-qr.png)
 

@@ -42,13 +42,13 @@ The 10 public cases are designed to be answerable by any decent deep-research sy
 Source-only until v0.1.0 lands on PyPI:
 
 ```bash
-pip install git+https://github.com/aiton08255/deep-research-bench
+pip install git+https://github.com/dnarsh/deep-research-bench
 ```
 
 Or clone and install editable for local hacking:
 
 ```bash
-git clone https://github.com/aiton08255/deep-research-bench
+git clone https://github.com/dnarsh/deep-research-bench
 pip install -e "./deep-research-bench[dev]"
 ```
 
@@ -296,7 +296,7 @@ Helpers for writing real-LLM judge adapters. Standard rubric, lenient parser.
 ## Run the tests
 
 ```bash
-git clone https://github.com/aiton08255/deep-research-bench
+git clone https://github.com/dnarsh/deep-research-bench
 cd deep-research-bench
 pip install -e ".[dev]"
 python -m pytest tests/ -v
@@ -339,4 +339,4 @@ Please do NOT submit PRs that:
 - Add async / parallel runners as the default (acceptable as an opt-in addon).
 - Expand the 10 public cases without a clear methodology — case selection bias is the whole game.
 
-Open an [issue](https://github.com/aiton08255/deep-research-bench/issues) before a large PR.
+Open an [issue](https://github.com/dnarsh/deep-research-bench/issues) before a large PR.
