@@ -1,0 +1,13 @@
+{
+  "file": "assets/banner/afterthought-banner-final.png",
+  "mode": "built-in image_gen, ivory editorial refinement",
+  "generatedUtc": "2026-10-28T05:43:37.2408947Z",
+  "sha256": "207c5656aa9ebf51681c4571888e5df6411e8321ca23cda49c3a7885e401d6f5",
+  "dimensions": [
+    1054,
+    1492
+  ],
+  "copy": "Main visible project, college, Arsh, 476CS24010, department head, technology, metadata count and URL checked visually.",
+  "qrVerification": "zxing-cpp: no code decoded. Generated QR is NOT print qualified. Replace using verified web/assets/brand/github-qr.svg/png before final publication/printing.",
+  "prompt": "assets/banner/final-prompt.txt"
+}

@@ -1,0 +1,9 @@
+{
+  "file": "assets/banner/afterthought-banner-final-qr.png",
+  "base": "assets/banner/afterthought-banner-final.png (built-in image_gen, sha256 207c5656aa9ebf51681c4571888e5df6411e8321ca23cda49c3a7885e401d6f5)",
+  "edit": "The generated QR did not decode. Its box was replaced with the mechanically generated, verified QR web/assets/brand/github-qr.png (pixel composite with Pillow, nearest-neighbour scaling, ivory backing). Nothing else was changed.",
+  "sha256": "8e2e73f2ecf89059593d64859856a01349d7a7d1e4a29cefc1742920b524e02e",
+  "dimensions": [1054, 1492],
+  "qrVerification": "zxing-cpp 3.1.1 decodes the whole banner to exactly https://github.com/dnarsh/AfterThought. Not tested with a phone camera or at print size.",
+  "copy": "Names, registration number, college, department and head are as supplied by the user and were checked visually only, not against the original template."
+}

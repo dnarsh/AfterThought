@@ -1,0 +1,25 @@
+Use case: style-transfer / editorial project poster refinement.
+Input 1 is the edit target: current AfterThought ivory academic project poster. Input 2 is the exact verified GitHub QR artwork, a functional insert, not a style reference.
+Human wants this FINAL poster to feel less sparse and more deliberately composed, while remaining serene, premium and ivory-dominant. Keep the portrait aspect ratio and all important identity/details. Do not return another near-identical overly empty layout.
+Art direction: warm ivory handmade paper (subtle, not dirty), deep olive ink, burnished copper details, quiet wabi-sabi print design with editorial structure. Give the middle right a substantial beautiful copper and olive neuron engraving, organically branching, refined scientific illustration but explicitly schematic. A faint second layer of neural branches can make it richer. No invented measurements, node IDs or scientific annotation. Add thin copper rules and soft warm-olive section fields for the lower information, creating clear hierarchy and visual weight without turning it into a dark poster. Do not add a heavy border. Keep coherent margins and ample breathing room, but use the available space purposefully. The title should occupy roughly 78% of width, not edge-to-edge.
+Typography MUST visibly improve: balanced warm book serif with moderate stroke contrast similar to Lora or a quiet Baskerville, medium weight, calm natural letterforms; avoid dramatic Didone hairlines, oversized curling terminals, italics, script and calligraphy. Use one harmonious humanist sans for all other text. Make supporting text comfortably readable, consistent sizes/alignment. Title in dark olive; copper only for small accents/section labels. Retain the college emblem/header accurately from target.
+All mandatory text, verbatim:
+M S RAMAIAH POLYTECHNIC
+Department of Computer Science and Engineering (CSE)
+5th Semester · 3rd Year
+AfterThought
+Evidence before confidence.
+Research evaluation · Experiment notes · FlyWire metadata
+Evaluate research answers with transparent checks. Explore real neuron data. Inspect every result.
+Arsh
+Reg. No. 476CS24010
+Python · HTML / CSS / JavaScript
+Local-first web app · Git & GitHub
+139,255 FlyWire v783 neuron records
+Metadata exploration, not a brain simulation.
+Department Head
+SMT. B. S. USHA
+GitHub · Scan to explore
+github.com/dnarsh/AfterThought
+Integrate the footer elegantly. Replace the invalid QR in target with the exact pixel/module structure of Input 2 inside a square ivory quiet zone. Do not invent/redraw a different code, stylize its cells, round its squares or run illustration behind it. It must retain all three finder squares and all modules, no lost or merged rows. It encodes https://github.com/dnarsh/AfterThought . Keep source URL fully visible as fallback.
+Constraints: no fake app screenshots, no stock tech glows, no gradients, no badges, no new claims, no 'AI brain simulation' language. One finished polished print-style portrait banner.

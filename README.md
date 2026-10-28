@@ -1,6 +1,6 @@
 # AfterThought
 
-![AfterThought — evidence before confidence](assets/banner/afterthought-banner.png)
+![AfterThought — evidence before confidence](assets/banner/afterthought-banner-final-qr.png)
 
 **An evidence workspace by Arsh Talkhani.** Turn a research answer into inspectable checks, explore published fly-neuron metadata, and follow an investigation into the limits of AI judging.
 
