@@ -68,6 +68,7 @@ const state = {
   transmitter: "",
   neuronBusy: false,
   neuronError: "",
+  preloaded: false,
 };
 const fmt = (n) => Number(n).toLocaleString();
 const title = (c) => titles[c.id] || c.id;
@@ -172,11 +173,16 @@ function metric(label, value, note) {
   return `<div class="metric"><div class="metric-label">${label}</div><div class="metric-value num">${value}</div><div class="metric-note">${note}</div></div>`;
 }
 function render() {
-  state.view = ["benchmark", "runs", "connectome", "research"].includes(
-    location.hash.slice(1),
-  )
+  state.view = [
+    "overview",
+    "guide",
+    "benchmark",
+    "runs",
+    "connectome",
+    "research",
+  ].includes(location.hash.slice(1))
     ? location.hash.slice(1)
-    : "benchmark";
+    : "overview";
   document.querySelectorAll("[data-nav]").forEach((a) => {
     const active = a.dataset.nav === state.view;
     a.classList.toggle("active", active);
@@ -184,17 +190,86 @@ function render() {
     else a.removeAttribute("aria-current");
   });
   $("#breadcrumb").textContent =
-    `Workspace / ${{ benchmark: "Benchmarks", runs: "Evaluation runs", connectome: "FlyWire connectome", research: "Einstein’s Jump" }[state.view]}`;
+    `Workspace / ${{ overview: "Introduction & demos", guide: "Live demo guide", benchmark: "Benchmarks", runs: "Evaluation runs", connectome: "FlyWire connectome", research: "Einstein’s Jump" }[state.view]}`;
   $("#run-count").textContent = state.history.length;
   $("#nav-count").textContent = state.cases.length || "—";
   $("#page").innerHTML =
-    state.view === "runs"
-      ? renderRuns()
-      : state.view === "research"
-        ? renderResearch()
-        : state.view === "connectome"
-          ? renderConnectome()
-          : renderBenchmark();
+    state.view === "guide"
+      ? renderGuide()
+      : state.view === "overview"
+        ? renderOverview()
+        : state.view === "runs"
+          ? renderRuns()
+          : state.view === "research"
+            ? renderResearch()
+            : state.view === "connectome"
+              ? renderConnectome()
+              : renderBenchmark();
+}
+function renderGuide() {
+  const steps = [
+    [
+      "Introduce the project",
+      "Say: AfterThought is a local evidence workspace. It checks research answers against explicit rules, makes experimental results inspectable, and explores real published fly-neuron metadata.",
+      "Explain the three parts: Deep Research Bench supplies the scorer, Einstein’s Jump supplies the research notebook, and FlyWire supplies a real metadata snapshot.",
+      "go-overview",
+      "Open introduction",
+    ],
+    [
+      "Run a passing example",
+      "Click the button below. It submits the authored, 111-word Python 3.13 example and its official documentation URL to the real Python runner.",
+      "Expected: 1 of 1 case passed; regex, citation count and word count each show 100%. These are structural checks, not a fact-checking verdict.",
+      "demo-score",
+      "Run passing example",
+    ],
+    [
+      "Show why an answer fails",
+      "Run the short answer with no citation. Inspect the failure details rather than presenting a score without an explanation.",
+      "Expected: the Python 3.13 case fails all three checks. Explain that changing the input changes the measured result, so this is a working evaluation, not a prerecorded screen.",
+      "demo-fail",
+      "Run failing example",
+    ],
+    [
+      "Run the suite and export evidence",
+      "Run all ten public cases with the deliberately weak deterministic mock. Inspect the per-case checks, then use Export JSON. Evaluation runs also offers Export Markdown.",
+      "Expected: ten scored cases, labeled Deterministic mock. The current mock fails the overall case contracts. No research provider or LLM judge has been called.",
+      "demo-suite",
+      "Run 10-case mock suite",
+    ],
+    [
+      "Query real fly-neuron data",
+      "Find GABA neurons in the preloaded FlyWire FAFB v783 snapshot. Then return here and inspect the exact-neuron example below.",
+      "Expected: 139,255 total records and 16,017 GABA matches. The exact ID 720575940598267657 has source group ME, predicted transmitter GABA and confidence 0.74. These are metadata predictions, not measured activity.",
+      "demo-neurons",
+      "Find GABA neurons",
+    ],
+    [
+      "Inspect one neuron precisely",
+      "Search one complete neuron ID. Notice that all 18 digits are preserved; the identifier is handled as text rather than rounded as a JavaScript number.",
+      "Expected: exactly one matching record, ID 720575940598267657. Use the source and license links to show where the data comes from.",
+      "demo-neuron",
+      "Find the exact neuron",
+    ],
+    [
+      "Explain the research and its limits",
+      "Open The follow-up in Einstein’s Jump. Both lone judges and panels found the relevant fraud records on the two reported cases; the project reported an honest null result.",
+      "Close with: The evaluation and dataset queries run live. A passing structural check does not certify truth or novelty. This app is not a brain simulation and does not use a fly brain to reason.",
+      "demo-research",
+      "Open the follow-up",
+    ],
+  ];
+  return `${heading("Live demo guide", "A 5–7 minute walkthrough. Use the buttons to run each real step.", '<button data-action="go-overview">Project introduction</button>')}
+  <section class="panel synopsis"><h2>Your 30-second synopsis</h2><p>AfterThought turns research claims into inspectable evidence. It combines a transparent evaluation framework, a notebook about the limits of AI judging, and a searchable connection to published FlyWire neuron metadata. Every score and dataset count has a visible source and a clear boundary.</p><p><strong>Before presenting:</strong> keep this localhost server running. The Windows launcher preloads FlyWire; without it, use <code>python run_app.py --preload-connectome</code>. No provider keys are needed. The first download requires internet; a valid local cache works afterward.</p></section>
+  <ol class="guide-list">${steps.map(([name, say, expected, action, label]) => `<li class="panel guide-step"><h2>${esc(name)}</h2><p>${esc(say)}</p><p class="expected"><strong>What to show:</strong> ${esc(expected)}</p><button class="primary" data-action="${action}">${icon("play")}${esc(label)}</button></li>`).join("")}</ol>
+  <section class="panel synopsis"><h2>If something is unavailable</h2><p>For a dataset error, retry in FlyWire connectome and check the internet connection. The scoring demo needs no network. If there is no report to export, run an evaluation first. Use the Live demo guide navigation item to return here after each step.</p><button data-action="export-json" ${state.run ? "" : "disabled"}>${icon("download")}Export the latest result</button></section>`;
+}
+function renderOverview() {
+  const d = state.connectome;
+  return `${heading("AfterThought", "An evidence workspace by Arsh Talkhani.", '<button class="primary" data-action="demo-score">' + icon("play") + "Start scoring demo</button>")}
+  <section class="panel overview-lead"><h2>From an answer to evidence.</h2><p>AI-generated research can sound convincing while missing the question, the sources, or the substance. AfterThought makes those expectations explicit, runs reproducible checks, and shows the reason behind every score.</p><p>This app brings together three pieces of work: the <strong>Deep Research Bench</strong> evaluation framework, the <strong>Einstein’s Jump</strong> investigation into judging novelty, and a real connection to the published <strong>FlyWire fly-brain metadata</strong>.</p><ol class="workflow"><li><strong>Choose a question</strong><span>Inspect a versioned case and its scoring rules.</span></li><li><strong>Evaluate an answer</strong><span>Run the actual regex, citation and length checks.</span></li><li><strong>Inspect the evidence</strong><span>Review each result and export the full report.</span></li></ol></section>
+  <div class="overview-grid"><section class="panel demo-card"><h2>A live research evaluation</h2><p>Score the supplied Python 3.13 example against the actual benchmark. Then shorten the answer or remove its citation and evaluate again to see which checks change.</p><div class="demo-actions"><button class="primary" data-action="demo-score">${icon("play")}Evaluate the example</button><button data-action="demo-fail">Show a failing answer</button></div><small>No AI response is generated. The example is authored demonstration text; scoring runs live in Python.</small></section>
+  <section class="panel demo-card"><h2>A real fly-connectome connection</h2><p>A connectome maps neural wiring. FlyWire’s published adult fruit-fly dataset also provides neuron metadata. Here you can search exact neuron IDs, explore source groups, and compare predicted transmitter counts.</p><div class="demo-actions"><button class="primary" data-action="demo-neurons">${icon("network")}Find GABA neurons</button><a class="external-link" href="#connectome">Open metadata explorer ↗</a></div><small>${d ? `${fmt(d.total_neurons)} real records loaded from FAFB v783.` : state.preloaded ? "The published snapshot is preloaded on this server." : "The snapshot loads on demand; use --preload-connectome before a demo."} CC BY-NC 4.0; cached locally.</small></section></div>
+  <section class="panel synopsis"><h2>What the work shows</h2><p><strong>Evaluation:</strong> ten public cases make research-answer structure measurable. Passing these checks does not prove the facts or citations are correct.</p><p><strong>Novelty:</strong> Einstein’s Jump documents seven phases of experiments, negative results and methodological limits. A confident judge is not a certificate of a new discovery.</p><p><strong>Connectomics:</strong> this app actively filters and summarizes real published neuron records. It does not load synaptic edges, run a neural model, simulate a fly, or use a brain to reason. Those would require a separate, validated simulation pipeline.</p><a class="external-link" href="#research">Inspect the research synopsis and original experiments ${icon("arrow")}</a></section>`;
 }
 function renderBenchmark() {
   const cells = state.run?.run.cells || [],
@@ -286,7 +361,7 @@ function renderRuns() {
 }
 function renderResearch() {
   const p = phases[state.phase];
-  return `${heading("Einstein’s Jump", "A research notebook on novelty, judges, and honest negative results.", `<a class="external-link" href="https://github.com/dnarsh/einsteins-jump" target="_blank" rel="noopener noreferrer">Open research repository ↗</a>`)}<div class="research-layout"><nav class="panel phase-list" aria-label="Research phases">${phases.map((p, i) => `<button class="phase-button ${i === state.phase ? "active" : ""}" data-phase="${i}">${esc(p.name)}<small>${esc(p.note)}</small></button>`).join("")}</nav><article class="panel research-article"><h2>${esc(p.heading)}</h2><p>${esc(p.body)}</p><div class="article-callout">${esc(p.finding)}</div><p>The common thread: a confident answer and a checkable answer are different things. Research Bench makes its scoring contracts visible so you can decide what a result actually supports.</p><a class="external-link" href="https://github.com/dnarsh/einsteins-jump/tree/main/${p.path}" target="_blank" rel="noopener noreferrer">Read the original experiment ${icon("arrow")}</a><div class="research-source">Summarized from Arsh’s Einstein’s Jump repository. Historical findings are attributed to that project; no new experiments or AI judging run on this screen.</div></article></div>`;
+  return `${heading("Einstein’s Jump", "A research notebook on novelty, judges, and honest negative results.", `<a class="external-link" href="https://github.com/dnarsh/einsteins-jump" target="_blank" rel="noopener noreferrer">Open research repository ↗</a>`)}<div class="research-layout"><nav class="panel phase-list" aria-label="Research phases">${phases.map((p, i) => `<button class="phase-button ${i === state.phase ? "active" : ""}" data-phase="${i}">${esc(p.name)}<small>${esc(p.note)}</small></button>`).join("")}</nav><article class="panel research-article"><h2>${esc(p.heading)}</h2><p>${esc(p.body)}</p><div class="article-callout">${esc(p.finding)}</div><p>The common thread: a confident answer and a checkable answer are different things. AfterThought makes its scoring contracts visible so you can decide what a result actually supports.</p><a class="external-link" href="https://github.com/dnarsh/einsteins-jump/tree/main/${p.path}" target="_blank" rel="noopener noreferrer">Read the original experiment ${icon("arrow")}</a><div class="research-source">Summarized from Arsh’s Einstein’s Jump repository. Historical findings are attributed to that project; no new experiments or AI judging run on this screen.</div></article></div>`;
 }
 function neuronIllustration() {
   return '<svg viewBox="0 0 280 190" fill="none" aria-hidden="true"><g stroke="#c7ced8" stroke-width="1.5"><path d="M48 38 114 87 53 146m61-59 62-52m-62 52 70 60m-70-60 111 5m-49-57 49 57-41 55M48 38l5 108m123-111 8 112M48 38l128-3"/></g><g fill="#fff" stroke="#8f9aaa" stroke-width="1.5"><circle cx="48" cy="38" r="7"/><circle cx="53" cy="146" r="7"/><circle cx="176" cy="35" r="7"/><circle cx="184" cy="147" r="7"/><circle cx="225" cy="92" r="7"/></g><circle cx="114" cy="87" r="13" fill="#f0f5fc" stroke="#1d5fbf" stroke-width="1.5"/><circle cx="114" cy="87" r="4" fill="#1d5fbf"/><text x="140" y="185" text-anchor="middle" fill="#697380" font-size="10" font-family="Geist,sans-serif">Metadata explorer · schematic illustration</text></svg>';
@@ -343,7 +418,7 @@ function download(format) {
         format === "json" ? "application/json" : "text/markdown;charset=utf-8",
     }),
   );
-  a.download = `research-bench-${state.run.mode}-${Date.now()}.${format === "json" ? "json" : "md"}`;
+  a.download = `afterthought-${state.run.mode}-${Date.now()}.${format === "json" ? "json" : "md"}`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   toast("Report exported.");
@@ -433,6 +508,44 @@ document.addEventListener("click", (e) => {
     return;
   }
   const action = e.target.closest("[data-action]")?.dataset.action;
+  if (action === "go-overview") location.hash = "overview";
+  if (action === "demo-suite") {
+    state.selected = new Set(state.cases.map((c) => c.id));
+    location.hash = "benchmark";
+    render();
+    evaluate("mock");
+  }
+  if (action === "demo-neuron") {
+    state.neuronQuery = "720575940598267657";
+    state.transmitter = "GABA";
+    location.hash = "connectome";
+    render();
+    loadNeurons();
+  }
+  if (action === "demo-research") {
+    state.phase = 6;
+    location.hash = "research";
+    render();
+  }
+  if (action === "demo-score" || action === "demo-fail") {
+    state.active = "recency-python-3-13-features";
+    const answer = draft(state.active);
+    answer.text = action === "demo-score" ? sampleAnswer : "Python is great.";
+    answer.citations =
+      action === "demo-score"
+        ? "https://docs.python.org/3.13/whatsnew/3.13.html"
+        : "";
+    location.hash = "benchmark";
+    render();
+    evaluate("manual");
+  }
+  if (action === "demo-neurons") {
+    state.neuronQuery = "";
+    state.transmitter = "GABA";
+    location.hash = "connectome";
+    render();
+    loadNeurons();
+  }
   if (action === "run-demo") evaluate("mock");
   if (action === "export-json") download("json");
   if (action === "export-md") download("md");
@@ -466,16 +579,29 @@ window.addEventListener("hashchange", () => {
   $("#navigation").classList.remove("open");
   $("#menu-button").setAttribute("aria-expanded", "false");
   render();
+  window.scrollTo({ top: 0, behavior: "instant" });
 });
 render();
 try {
-  const data = await api("/api/cases");
+  const [data, health] = await Promise.all([
+    api("/api/cases"),
+    api("/api/health"),
+  ]);
   state.cases = data.cases;
   state.selected = new Set(data.cases.map((c) => c.id));
   state.active = data.cases[0]?.id;
+  state.preloaded = health.connectome_preloaded === true;
   $("#server-state").innerHTML =
     '<span class="local-dot"></span>Local scoring engine ready';
   render();
+  if (state.preloaded) {
+    try {
+      state.connectome = await api("/api/connectome?limit=30");
+      render();
+    } catch {
+      /* The explorer retains its explicit retry action. */
+    }
+  }
 } catch (e) {
   $("#server-state").textContent = "Local engine unavailable";
   state.error = e.message;

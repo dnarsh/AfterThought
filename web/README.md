@@ -1,4 +1,4 @@
-# Research Bench app
+# AfterThought app
 
 Run from a source checkout with Python 3.8 or newer:
 
@@ -7,8 +7,12 @@ python run_app.py
 ```
 
 On Windows you can also double-click `start-app.cmd`. Open
-<http://127.0.0.1:8765> in your browser. The server binds only to the loopback
-interface. Stop it with Ctrl+C. No runtime dependencies, model accounts, or
+<http://127.0.0.1:8765> in your browser. For instant dataset demos use `python run_app.py --preload-connectome`. The Windows
+launcher enables this option. It warms the real metadata cache before serving;
+if loading fails the app still starts with a safe warning and an explicit Retry.
+The server binds only to the loopback
+interface. Stop it with Ctrl+C. The Introduction page explains the project and the in-app Live demo guide provides
+seven runnable presenter steps. No runtime dependencies, model accounts, or
 provider keys are needed. `python run_app.py --port 8766` chooses another port.
 
 ## What works
@@ -40,7 +44,7 @@ explicitly records `generated_by_app: false`.
 
 The FlyWire connector reads one fixed, official
 [v783 archive](https://storage.googleapis.com/flywire-data/codex/data/fafb/783/neurons.csv.gz),
-on an explicit user action. It caches approximately 1.7 MB under ignored
+on an explicit user action or with the optional `--preload-connectome` launch flag. It caches approximately 1.7 MB under ignored
 `.cache/flywire/`, validates compressed/decompressed limits, reuses parsed
 metadata across queries, and repairs corrupt caches with one validated refetch.
 It does not fetch the much larger synaptic graph, simulate neural activity, or

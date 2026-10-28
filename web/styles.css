@@ -495,7 +495,12 @@ main {
   border-color: var(--text);
 }
 .check-box:checked::after {
-  content: "✓";
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 1.5px solid white;
+  border-bottom: 1.5px solid white;
+  transform: rotate(-45deg);
   font-size: 11px;
   color: white;
   line-height: 1;
@@ -1249,4 +1254,50 @@ summary {
 }
 .form-help {
   margin: 7px 0 12px;
+}
+
+.guide-list {
+  list-style: decimal;
+  padding-left: 28px;
+  margin: 22px 0;
+}
+.guide-step {
+  padding: 22px 26px;
+  margin-bottom: 16px;
+  overflow: visible;
+}
+.guide-step::marker {
+  font-size: 14px;
+  color: var(--muted);
+}
+.guide-step h2 {
+  margin-bottom: 12px;
+}
+.guide-step p {
+  font-size: 14px;
+  line-height: 1.75;
+  max-width: 90ch;
+  margin-bottom: 13px;
+}
+.guide-step .expected {
+  color: var(--muted);
+}
+.guide-step button {
+  margin-top: 5px;
+}
+.synopsis code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 740px) {
+  .guide-list {
+    padding-left: 21px;
+  }
+  .guide-step {
+    padding: 19px 17px;
+  }
+  .guide-step button {
+    min-height: 44px;
+    width: 100%;
+  }
 }

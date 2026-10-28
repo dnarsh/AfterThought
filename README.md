@@ -1,4 +1,6 @@
-# deep-research-bench
+# AfterThought
+
+A local evidence workspace built on the `deep-research-bench` Python framework.
 
 ## Local app
 

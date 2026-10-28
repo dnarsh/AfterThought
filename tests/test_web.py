@@ -1,15 +1,17 @@
 """HTTP entrypoint checks using the real benchmark runner and scorers."""
 
 import http.client
+import io
 import json
 import tempfile
 import threading
 import types
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from deep_research_bench.web import BenchServer, MAX_REQUEST_BYTES
+from deep_research_bench.web import BenchServer, MAX_REQUEST_BYTES, main, preload_connectome
 
 
 class WebTests(unittest.TestCase):
@@ -62,6 +64,7 @@ class WebTests(unittest.TestCase):
         status, _, raw = self.request("GET", "/api/health")
         self.assertEqual(status, 200)
         self.assertIs(json.loads(raw)["live_provider"], False)
+        self.assertIs(json.loads(raw)["connectome_preloaded"], False)
 
     def test_manual_http_runs_real_three_scorers_and_reports_answer(self):
         text = "Python 3.13 includes experimental JIT and free-threaded GIL work. " + "explanation " * 90
@@ -203,6 +206,52 @@ class WebTests(unittest.TestCase):
             self.assertEqual(status, 502)
             self.assertEqual(json.loads(raw)["error"], "CONNECTOME_UNAVAILABLE")
             self.assertNotIn(b"private", raw)
+
+    def test_preload_sets_actual_health_state_only_after_success(self):
+        stdout = io.StringIO()
+        try:
+            with patch(
+                "deep_research_bench.connectome.query_neurons",
+                return_value={"total_neurons": 139255},
+            ) as query, redirect_stdout(stdout):
+                self.assertIs(preload_connectome(self.server), True)
+            query.assert_called_once_with(limit=1)
+            self.assertIn("139255 neurons", stdout.getvalue())
+            status, _, raw = self.request("GET", "/api/health")
+            self.assertEqual(status, 200)
+            self.assertIs(json.loads(raw)["connectome_preloaded"], True)
+
+            stdout = io.StringIO()
+            with patch(
+                "deep_research_bench.connectome.query_neurons",
+                side_effect=RuntimeError("private path and downstream response"),
+            ), redirect_stdout(stdout):
+                self.assertIs(preload_connectome(self.server), False)
+            self.assertNotIn("private", stdout.getvalue())
+            self.assertIn("preload unavailable", stdout.getvalue())
+            status, _, raw = self.request("GET", "/api/health")
+            self.assertEqual(status, 200)
+            self.assertIs(json.loads(raw)["connectome_preloaded"], False)
+        finally:
+            self.server.connectome_preloaded = False
+
+    def test_cli_preload_is_opt_in_and_failure_does_not_abort_serving(self):
+        for enabled in [False, True]:
+            with self.subTest(enabled=enabled):
+                server = MagicMock()
+                server.__enter__.return_value = server
+                server.server_port = 8765
+                server.serve_forever.side_effect = KeyboardInterrupt()
+                argv = ["--port", "8765"] + (["--preload-connectome"] if enabled else [])
+                with patch("deep_research_bench.web.BenchServer", return_value=server), patch(
+                    "deep_research_bench.web.preload_connectome", return_value=False
+                ) as preload, redirect_stdout(io.StringIO()):
+                    self.assertEqual(main(argv), 0)
+                server.serve_forever.assert_called_once_with()
+                if enabled:
+                    preload.assert_called_once_with(server)
+                else:
+                    preload.assert_not_called()
 
 
 if __name__ == "__main__":

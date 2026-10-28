@@ -63,6 +63,7 @@ class BenchServer(ThreadingHTTPServer):
         self.cases = load_cases(self.cases_path)
         self.case_by_id = {case.id: case for case in self.cases}
         self.suite = json.loads(self.cases_path.read_text(encoding="utf-8"))
+        self.connectome_preloaded = False
         super().__init__(("127.0.0.1", port), BenchHandler)
 
 
@@ -74,7 +75,7 @@ class BenchHandler(BaseHTTPRequestHandler):
         self.connection.settimeout(10)
 
     def version_string(self) -> str:
-        return "ResearchBench"
+        return "AfterThought"
 
     def log_message(self, format: str, *args: Any) -> None:
         # Request bodies can contain unpublished research; never log their content.
@@ -121,9 +122,10 @@ class BenchHandler(BaseHTTPRequestHandler):
         if path == "/api/health":
             self._json(200, {
                 "status": "ok",
-                "app": "Deep Research Bench",
+                "app": "AfterThought",
                 "case_count": len(self.server.cases),
                 "live_provider": False,
+                "connectome_preloaded": self.server.connectome_preloaded,
             })
             return
         if path == "/api/cases":
@@ -286,14 +288,45 @@ class BenchHandler(BaseHTTPRequestHandler):
             self._json(500, {"error": "Could not evaluate the submitted answers."})
 
 
+def preload_connectome(server: BenchServer) -> bool:
+    """Warm the fixed public metadata snapshot only when explicitly requested."""
+    server.connectome_preloaded = False
+    try:
+        from deep_research_bench.connectome import query_neurons
+
+        result = query_neurons(limit=1)
+        total = result["total_neurons"]
+        if not isinstance(total, int) or isinstance(total, bool) or total <= 0:
+            raise ValueError("invalid snapshot count")
+    except Exception:
+        print(
+            "FlyWire preload unavailable; load the metadata snapshot from the app to retry.",
+            flush=True,
+        )
+        return False
+    server.connectome_preloaded = True
+    print(
+        "FlyWire FAFB v783 metadata preloaded: %s neurons (published snapshot, not a neural simulation)." % total,
+        flush=True,
+    )
+    return True
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the local Deep Research Bench app.")
+    parser = argparse.ArgumentParser(description="Run the local AfterThought app.")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument(
+        "--preload-connectome",
+        action="store_true",
+        help="Load the fixed public FlyWire metadata snapshot before serving the app.",
+    )
     args = parser.parse_args(argv)
     if not 0 <= args.port <= 65535:
         parser.error("port must be between 0 and 65535")
     with BenchServer(args.port) as server:
-        print("Deep Research Bench: http://127.0.0.1:%s" % server.server_port, flush=True)
+        if args.preload_connectome:
+            preload_connectome(server)
+        print("AfterThought: http://127.0.0.1:%s" % server.server_port, flush=True)
         print("Local scoring only; no provider API or LLM judge is connected.", flush=True)
         try:
             server.serve_forever()
