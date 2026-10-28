@@ -230,66 +230,66 @@ function render() {
 function renderGuide() {
   const steps = [
     [
-      "Introduce the project",
-      "Say: AfterThought is a local evidence workspace. It checks research answers against explicit rules, makes experimental results inspectable, and explores real published fly-neuron metadata.",
-      "Explain the three parts: Deep Research Bench supplies the scorer, Einstein’s Jump supplies the research notebook, and FlyWire supplies a real metadata snapshot.",
+      "The project",
+      "AfterThought is a local evidence workspace. It checks research answers against explicit rules, makes experimental results inspectable, and explores real published fly-neuron metadata.",
+      "Three parts work together: Deep Research Bench supplies the scorer, Einstein’s Jump supplies the research notebook, and FlyWire supplies a real metadata snapshot.",
       "go-overview",
       "Open introduction",
     ],
     [
-      "Run a passing example",
-      "Click the button below. It submits the authored, 111-word Python 3.13 example and its official documentation URL to the real Python runner.",
-      "Expected: 1 of 1 case passed; regex, citation count and word count each show 100%. These are structural checks, not a fact-checking verdict.",
+      "A passing example",
+      "This step submits an authored, 111-word Python 3.13 answer and its official documentation URL to the real Python runner.",
+      "Result: 1 of 1 case passes, and regex, citation count and word count each score 100%. These are structural checks, not a fact-checking verdict.",
       "demo-score",
       "Run passing example",
     ],
     [
-      "Show why an answer fails",
-      "Run the short answer with no citation. Inspect the failure details rather than presenting a score without an explanation.",
-      "Expected: the Python 3.13 case fails all three checks. Explain that changing the input changes the measured result, so this is a working evaluation, not a prerecorded screen.",
+      "Why an answer fails",
+      "This step runs a short answer with no citation, and every failure comes with its reason instead of a bare score.",
+      "Result: the Python 3.13 case fails all three checks. Changing the input changes the measured result, so this is a working evaluation, not a prerecorded screen.",
       "demo-fail",
       "Run failing example",
     ],
     [
-      "Run the suite and export evidence",
-      "Run all ten public cases with the deliberately weak deterministic mock. Inspect the per-case checks, then use Export JSON. Evaluation runs also offers Export Markdown.",
-      "Expected: ten scored cases, labeled Deterministic mock. The current mock fails the overall case contracts. No research provider or LLM judge has been called.",
+      "The full suite and its evidence",
+      "All ten public cases run against a deliberately weak deterministic mock, with per-case checks that can be exported as JSON or Markdown.",
+      "Result: ten scored cases, labelled Deterministic mock. The mock fails the case contracts, as expected. No research provider or LLM judge is called.",
       "demo-suite",
       "Run 10-case mock suite",
     ],
     [
-      "Query real fly-neuron data",
-      "Find GABA neurons in the preloaded FlyWire FAFB v783 snapshot. Then return here and inspect the exact-neuron example below.",
-      "Expected: 139,255 total records and 16,017 GABA matches. The exact ID 720575940598267657 has source group ME, predicted transmitter GABA and confidence 0.74. These are metadata predictions, not measured activity.",
+      "Real fly-neuron data",
+      "This step searches the preloaded FlyWire FAFB v783 snapshot for neurons whose predicted neurotransmitter is GABA.",
+      "Result: 139,255 total records and 16,017 GABA matches. These are metadata predictions, not measured activity.",
       "demo-neurons",
       "Find GABA neurons",
     ],
     [
-      "Inspect one neuron precisely",
-      "Search one complete neuron ID. Notice that all 18 digits are preserved; the identifier is handled as text rather than rounded as a JavaScript number.",
-      "Expected: exactly one matching record, ID 720575940598267657. Use the source and license links to show where the data comes from.",
+      "One neuron, precisely",
+      "This step looks up one complete neuron ID. All 18 digits are preserved, because the identifier is handled as text rather than rounded as a JavaScript number.",
+      "Result: exactly one matching record, ID 720575940598267657, source group ME, predicted transmitter GABA, confidence 0.74. The source and licence links show where the data comes from.",
       "demo-neuron",
       "Find the exact neuron",
     ],
     [
-      "Explain the research and its limits",
-      "Open The follow-up in Einstein’s Jump. Both lone judges and panels found the relevant fraud records on the two reported cases; the project reported an honest null result.",
-      "Close with: The evaluation and dataset queries run live. A passing structural check does not certify truth or novelty. This app is not a brain simulation and does not use a fly brain to reason.",
+      "The research and its limits",
+      "The Einstein’s Jump follow-up reports that both lone judges and panels found the relevant fraud records on the two reported cases, and the project reported an honest null result.",
+      "Limits: the evaluation and dataset queries run live. A passing structural check does not certify truth or novelty. This app is not a brain simulation and does not use a fly brain to reason.",
       "demo-research",
       "Open the follow-up",
     ],
   ];
   steps.splice(6, 0, [
-    "Turn neuron data into research evidence",
-    "Build a research brief from the actual FlyWire counts, computed fraction and official source. Evaluate the draft, then edit a count or remove a citation to expose a failed check.",
-    "Expected: a source-derived brief with 139,255 total records, 16,017 predicted GABA records and an 11.50% share; its unedited draft passes all three structural scorers. This is data analysis, not brain reasoning.",
+    "From neuron data to research evidence",
+    "This step builds a research brief from the actual FlyWire counts, the computed fraction and the official source, then evaluates it. Editing a count or removing the citation makes a check fail.",
+    "Result: a source-derived brief with 139,255 total records, 16,017 predicted GABA records and an 11.50% share. The unedited draft passes all three structural scorers. This is data analysis, not brain reasoning.",
     "demo-brief",
     "Run the FlyWire research demo",
   ]);
-  return `${heading("Live demo guide", "A 6–8 minute walkthrough. Use the buttons to run each real step.", '<button data-action="go-overview">Project introduction</button><button class="primary" data-action="demo-score">' + icon("play") + "Run passing example</button>")}
-  <section class="panel synopsis"><h2>Your 30-second synopsis</h2><p>AfterThought turns research claims into inspectable evidence. It combines a transparent evaluation framework, a notebook about the limits of AI judging, and a searchable connection to published FlyWire neuron metadata. Every score and dataset count has a visible source and a clear boundary.</p><p><strong>Before presenting:</strong> keep this localhost server running. The Windows launcher preloads FlyWire; without it, use <code>python run_app.py --preload-connectome</code>. No provider keys are needed. The first download requires internet; a valid local cache works afterward.</p></section>
-  <ol class="guide-list">${steps.map(([name, say, expected, action, label]) => `<li class="panel guide-step"><div class="step-body"><h2>${esc(name)}</h2><p>${esc(say)}</p><p class="expected"><strong>What to show:</strong> ${esc(expected)}</p></div><button data-action="${action}">${icon("play")}${esc(label)}</button></li>`).join("")}</ol>
-  <section class="panel synopsis"><h2>If something is unavailable</h2><p>For a dataset error, retry in FlyWire connectome and check the internet connection. The scoring demo needs no network. If there is no report to export, run an evaluation first. Use the Live demo guide navigation item to return here after each step.</p><button data-action="export-json" ${state.history.length ? "" : "disabled"}>${icon("download")}Export the latest result</button></section>`;
+  return `${heading("Live demo guide", "A 6–8 minute walkthrough of the app’s real steps, each run live.", '<button data-action="go-overview">Project introduction</button><button class="primary" data-action="demo-score">' + icon("play") + "Run passing example</button>")}
+  <section class="panel synopsis"><h2>About AfterThought</h2><p>AfterThought turns research claims into inspectable evidence. It combines a transparent evaluation framework, a notebook about the limits of AI judging, and a searchable connection to published FlyWire neuron metadata. Every score and dataset count has a visible source and a clear boundary.</p><p>It runs entirely on this computer and needs no provider keys. The FlyWire snapshot is preloaded, and scoring needs no network.</p></section>
+  <ol class="guide-list">${steps.map(([name, say, expected, action, label]) => `<li class="panel guide-step"><div class="step-body"><h2>${esc(name)}</h2><p>${esc(say)}</p><p class="expected">${esc(expected)}</p></div><button data-action="${action}">${icon("play")}${esc(label)}</button></li>`).join("")}</ol>
+  <section class="panel synopsis"><h2>Notes</h2><p>The first FlyWire download needs internet and a valid local cache works afterward. Export becomes available once an evaluation has run.</p><button data-action="export-json" ${state.history.length ? "" : "disabled"}>${icon("download")}Export the latest result</button></section>`;
 }
 function renderOverview() {
   const d = state.connectome;
