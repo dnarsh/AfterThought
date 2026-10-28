@@ -444,9 +444,6 @@ button {
   min-height: 32px;
   padding: 4px 0;
 }
-.case-title {
-  min-height: 24px;
-}
 button:not(.primary):not(.text-button):not(.case-title):not(.phase-button):hover:not(:disabled) {
   background: var(--raised);
   border-color: var(--muted);
@@ -941,4 +938,48 @@ button:not(.primary):not(.text-button):not(.case-title):not(.phase-button):hover
 }
 .overview-grid {
   align-items: stretch;
+}
+@media (max-width: 740px) {
+  .brand,
+  .external-link,
+  .project-qr a,
+  .lead-link,
+  .source-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .project-qr p a {
+    display: inline-block;
+    min-height: 0;
+    padding: 12px 0;
+  }
+  .search {
+    min-height: 44px;
+  }
+  .search input {
+    height: 42px;
+  }
+  .filter-row select {
+    min-height: 44px;
+  }
+  summary {
+    padding: 13px 0;
+  }
+  .panel-foot a {
+    padding: 12px 0;
+  }
+}
+@media (max-width: 740px) {
+  .page-heading button,
+  .run-row button {
+    min-height: 44px;
+  }
+  .provenance a,
+  .panel-foot a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+  }
 }
