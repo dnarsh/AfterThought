@@ -151,13 +151,24 @@ class WebTests(unittest.TestCase):
         )
         self.assertEqual(status, 413)
 
+    def test_content_length_uses_http_decimal_grammar(self):
+        for value in ["+2", "2_0", "-1"]:
+            with self.subTest(value=value):
+                status, _, raw = self.request(
+                    "POST", "/api/run", b"{}",
+                    {"Content-Type": "application/json", "Content-Length": value},
+                )
+                self.assertEqual(status, 400)
+                self.assertNotIn(b"run", json.loads(raw))
+
     def test_static_files_cannot_escape_web_root(self):
         status, headers, raw = self.request("GET", "/")
         self.assertEqual(status, 200)
         self.assertEqual(raw, b"<h1>Research Bench</h1>")
         self.assertIn("text/html", headers["Content-Type"])
-        status, _, raw = self.request("GET", "/app.js")
+        status, headers, raw = self.request("GET", "/app.js")
         self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "text/javascript; charset=utf-8")
         self.assertIn(b"console.log", raw)
         for path in ["/%2e%2e/README.md", "/%2e%2e%5cREADME.md", "/%00", "/api/no-such-route"]:
             with self.subTest(path=path):

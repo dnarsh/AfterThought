@@ -27,7 +27,11 @@ DEFAULT_CACHE_DIR = Path(__file__).resolve().parents[2] / ".cache" / "flywire"
 MAX_COMPRESSED_BYTES = 4 * 1024 * 1024
 MAX_DECODED_BYTES = 40 * 1024 * 1024
 MAX_LINE_BYTES = 64 * 1024
+# This connector serves one fixed snapshot, not arbitrary uploaded datasets.
+MAX_NEURONS = 200_000
 _CACHE_LOCK = threading.Lock()
+_MEMO_SIGNATURE = None
+_MEMO = None
 
 
 class ConnectomeError(RuntimeError):
@@ -71,33 +75,73 @@ def _rows(archive: bytes) -> Iterator[Dict[str, str]]:
         yield row
 
 
-def _archive():
-    # One fixed filename and a serialized atomic write keep simultaneous requests
-    # from publishing a partial download. The ignored cache contains public data.
+def _parse_archive(archive: bytes):
+    if len(archive) > MAX_COMPRESSED_BYTES:
+        raise ConnectomeError("The FlyWire metadata archive exceeds the download limit.")
+    records = []
+    counts = Counter()
+    for row in _rows(archive):
+        if len(records) >= MAX_NEURONS:
+            raise ConnectomeError("The FlyWire metadata exceeds the neuron limit.")
+        nt = row["nt_type"].strip().upper() or "UNKNOWN"
+        raw_score = row["nt_type_score"].strip()
+        confidence = float(raw_score) if raw_score else None
+        if confidence is not None and (not math.isfinite(confidence) or not 0 <= confidence <= 1):
+            raise ConnectomeError("The FlyWire metadata contains an invalid prediction score.")
+        # Compact immutable tuples retain only the four displayed fields, not the
+        # source's per-transmitter columns or one dictionary per neuron.
+        records.append((row["root_id"], row["group"].strip(), nt, confidence))
+        counts[nt] += 1
+    if not records:
+        raise ConnectomeError("The FlyWire metadata contains no neuron records.")
+    return tuple(records), tuple(sorted(counts.items(), key=lambda item: (-item[1], item[0])))
+
+
+def _publish_archive(cache_file: Path, archive: bytes):
+    DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", dir=str(DEFAULT_CACHE_DIR), prefix=".neurons-", delete=False
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(archive)
+        os.replace(str(temporary), str(cache_file))
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
+def _snapshot():
+    global _MEMO_SIGNATURE, _MEMO
     cache_file = DEFAULT_CACHE_DIR / "neurons-v783.csv.gz"
+    # Serialize download/parse/publication. All query threads reuse at most one
+    # immutable parsed snapshot, invalidated when the on-disk file changes.
     with _CACHE_LOCK:
-        if cache_file.exists():
-            if cache_file.stat().st_size > MAX_COMPRESSED_BYTES:
-                raise ConnectomeError("The cached FlyWire metadata exceeds the data limit.")
-            return cache_file.read_bytes(), cache_file.stat().st_mtime
-        archive = _fetch_bytes()
-        # Validate the complete archive before making it reusable by later calls.
-        count = sum(1 for _ in _rows(archive))
-        if not count:
-            raise ConnectomeError("The FlyWire metadata contains no neuron records.")
-        DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        temporary = None
-        try:
-            with tempfile.NamedTemporaryFile(
-                mode="wb", dir=str(DEFAULT_CACHE_DIR), prefix=".neurons-", delete=False
-            ) as handle:
-                temporary = Path(handle.name)
-                handle.write(archive)
-            os.replace(str(temporary), str(cache_file))
-        finally:
-            if temporary is not None and temporary.exists():
-                temporary.unlink()
-        return archive, cache_file.stat().st_mtime
+        stat = cache_file.stat() if cache_file.exists() else None
+        signature = (str(cache_file), stat.st_mtime_ns, stat.st_size) if stat else None
+        if signature is not None and signature == _MEMO_SIGNATURE and _MEMO is not None:
+            return _MEMO
+        _MEMO_SIGNATURE = None
+        _MEMO = None
+        parsed = None
+        if stat is not None:
+            try:
+                if stat.st_size > MAX_COMPRESSED_BYTES:
+                    raise ConnectomeError("The cached FlyWire metadata exceeds the data limit.")
+                parsed = _parse_archive(cache_file.read_bytes())
+            except (ConnectomeError, OSError, EOFError, UnicodeError, csv.Error, ValueError):
+                # Recover one corrupt/truncated local archive through the same
+                # fixed official source. A bad fresh archive is never published.
+                parsed = None
+        if parsed is None:
+            archive = _fetch_bytes()
+            parsed = _parse_archive(archive)
+            _publish_archive(cache_file, archive)
+            stat = cache_file.stat()
+        _MEMO_SIGNATURE = (str(cache_file), stat.st_mtime_ns, stat.st_size)
+        _MEMO = (parsed, stat.st_mtime)
+        return _MEMO
 
 
 def query_neurons(q: str = "", transmitter: str = "", limit: int = 30) -> dict:
@@ -115,30 +159,20 @@ def query_neurons(q: str = "", transmitter: str = "", limit: int = 30) -> dict:
     query = q.strip().casefold()
     selected_transmitter = transmitter.strip().upper()
     try:
-        archive, retrieved = _archive()
-        counts = Counter()
+        (records, counts), retrieved = _snapshot()
         neurons = []
-        total = 0
         matching = 0
-        for row in _rows(archive):
-            total += 1
-            nt = row["nt_type"].strip().upper() or "UNKNOWN"
-            counts[nt] += 1
-            group = row["group"].strip()
+        for root_id, group, nt, confidence in records:
             if selected_transmitter and nt != selected_transmitter:
                 continue
-            if query and query not in " ".join((row["root_id"], group, nt)).casefold():
+            if query and query not in " ".join((root_id, group, nt)).casefold():
                 continue
             matching += 1
             if len(neurons) >= limit:
                 continue
-            raw_score = row["nt_type_score"].strip()
-            confidence = float(raw_score) if raw_score else None
-            if confidence is not None and (not math.isfinite(confidence) or not 0 <= confidence <= 1):
-                raise ConnectomeError("The FlyWire metadata contains an invalid prediction score.")
             neurons.append({
-                "id": row["root_id"],
-                "label": group or row["root_id"],
+                "id": root_id,
+                "label": group or root_id,
                 "group": group,
                 "neurotransmitter": nt,
                 "confidence": confidence,
@@ -149,11 +183,11 @@ def query_neurons(q: str = "", transmitter: str = "", limit: int = 30) -> dict:
             "license_url": LICENSE_URL,
             "license": "CC BY-NC 4.0",
             "snapshot": True,
-            "total_neurons": total,
+            "total_neurons": len(records),
             "matching_neurons": matching,
             "neurotransmitters": [
                 {"name": name, "count": count}
-                for name, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+                for name, count in counts
             ],
             "neurons": neurons,
             "retrieved_at": datetime.fromtimestamp(retrieved, timezone.utc).isoformat(),

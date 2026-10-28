@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import mimetypes
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -31,6 +30,14 @@ from deep_research_bench.adapters.mock_engine import MockEngine
 ROOT = Path(__file__).resolve().parents[2]
 MAX_REQUEST_BYTES = 1024 * 1024
 MAX_ANSWER_CHARS = 200_000
+STATIC_TYPES = {
+    ".html": "text/html; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".ttf": "font/ttf",
+    ".txt": "text/plain; charset=utf-8",
+}
 
 
 class RequestError(ValueError):
@@ -169,9 +176,8 @@ class BenchHandler(BaseHTTPRequestHandler):
         except (OSError, ValueError):
             self._json(404, {"error": "File not found."})
             return
-        content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-        if content_type.startswith("text/") or content_type == "application/javascript":
-            content_type += "; charset=utf-8"
+        # Windows registry MIME associations must not disable scripts under nosniff.
+        content_type = STATIC_TYPES.get(target.suffix.lower(), "application/octet-stream")
         self._send(200, content, content_type)
 
     def _read_payload(self) -> Optional[dict]:
@@ -180,10 +186,9 @@ class BenchHandler(BaseHTTPRequestHandler):
         lengths = self.headers.get_all("Content-Length", [])
         if len(lengths) != 1:
             raise RequestError("A valid Content-Length is required.")
-        try:
-            length = int(lengths[0])
-        except ValueError:
+        if not lengths[0].isascii() or not lengths[0].isdigit():
             raise RequestError("A valid Content-Length is required.")
+        length = int(lengths[0])
         if length < 0:
             raise RequestError("A valid Content-Length is required.")
         if length > MAX_REQUEST_BYTES:
