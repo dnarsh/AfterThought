@@ -139,7 +139,7 @@ from deep_research_bench.judge import parse_judge_response
 import anthropic  # or openai, or whatever
 
 class ClaudeJudge:
-    name = "claude-3-7-sonnet"
+    name = "claude-sonnet-4-6"
 
     def __init__(self, client):
         self.client = client
